@@ -42,7 +42,7 @@ public class ItemController {
         log.info("Getting a list of all items that belong to user with ID: " + userId);
         return ResponseEntity.ok(itemService.findAllItems(userId)
                 .stream()
-                .map(ItemMapper.INSTANCE::ItemToItemDto)
+                .map(ItemMapper.INSTANCE::itemToItemDto)
                 .collect(Collectors.toList()));
     }
 
@@ -53,7 +53,7 @@ public class ItemController {
             @PathVariable @Min(1) Long id
     ) {
         log.info("Getting item with ID: " + id + " that belongs to user " + userId);
-        return ResponseEntity.ok(ItemMapper.INSTANCE.ItemToItemDto(itemService.findItem(id)));
+        return ResponseEntity.ok(ItemMapper.INSTANCE.itemToItemDto(itemService.findItem(id)));
     }
 
     @GetMapping("/search")
@@ -63,7 +63,7 @@ public class ItemController {
         if (!text.isBlank()) {
             return ResponseEntity.ok(itemService.searchItems(text.toUpperCase())
                     .stream()
-                    .map(ItemMapper.INSTANCE::ItemToItemDto)
+                    .map(ItemMapper.INSTANCE::itemToItemDto)
                     .collect(Collectors.toList()));
         } else {
             return ResponseEntity.ok(new ArrayList<>());
@@ -80,8 +80,8 @@ public class ItemController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(
-                        ItemMapper.INSTANCE.ItemToItemDto(
-                                itemService.createItem(ItemMapper.INSTANCE.ItemDtoToItem(itemDto), userId)
+                        ItemMapper.INSTANCE.itemToItemDto(
+                                itemService.createItem(ItemMapper.INSTANCE.itemDtoToItem(itemDto), userId)
                         )
                 );
     }
@@ -97,7 +97,7 @@ public class ItemController {
         Item item = itemService.findItem(id);
         if (item.getOwner().getId().equals(userId)) {
             ItemMapper.INSTANCE.updateItemFromDto(itemDto, item);
-            return ResponseEntity.ok().body(ItemMapper.INSTANCE.ItemToItemDto(itemService.updateItem(item)));
+            return ResponseEntity.ok().body(ItemMapper.INSTANCE.itemToItemDto(itemService.updateItem(item)));
         } else {
             throw new WrongUserException("Item does not belong to user with ID: " + item.getOwner().getId());
         }

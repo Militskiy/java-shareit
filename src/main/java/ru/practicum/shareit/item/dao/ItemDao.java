@@ -7,9 +7,14 @@ import java.util.Optional;
 
 public interface ItemDao {
     Optional<Item> findItem(Long id);
+
     List<Item> findAllItems(Long userId);
+
     Item createItem(Item item);
+
     Item updateItem(Item item);
+
     void deleteItem(Long id);
+
     List<Item> searchItems(String text);
 }

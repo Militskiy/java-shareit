@@ -36,6 +36,7 @@ public class GlobalExceptionHandler {
         log.info(e.getMessage());
         return ResponseEntity.status(404).body(e.getMessage());
     }
+
     @ExceptionHandler
     public ResponseEntity<String> handleWrongUserException(final WrongUserException e) {
         log.info(e.getMessage());
