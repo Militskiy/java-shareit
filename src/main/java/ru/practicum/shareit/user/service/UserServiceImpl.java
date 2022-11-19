@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dao.UserDao;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserDtoList;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.exceptions.DuplicateEmailException;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
@@ -29,17 +30,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAllUsers() {
-        return userRepository.findAllUsers()
-                .stream()
-                .map(UserMapper.INSTANCE::userToUserDto)
-                .collect(Collectors.toList());
+    public UserDtoList findAllUsers() {
+        return UserDtoList.builder()
+                .userDtoList(
+                        getUsers()
+                                .stream()
+                                .map(UserMapper.INSTANCE::userToUserDto)
+                                .collect(Collectors.toList())
+                )
+                .build();
     }
 
     @Override
     public UserDto createUser(UserDto userDto) {
         User newUser = UserMapper.INSTANCE.userDtoToUser(userDto);
-        if (findAllUsers().stream().noneMatch(user -> user.getEmail().equals(newUser.getEmail()))) {
+        if (getUsers().stream().noneMatch(user -> user.getEmail().equals(newUser.getEmail()))) {
             return UserMapper.INSTANCE.userToUserDto(userRepository.createUser(newUser));
         } else {
             throw new DuplicateEmailException("Email: " + newUser.getEmail() + " already exists");
@@ -53,7 +58,7 @@ public class UserServiceImpl implements UserService {
         UserMapper.INSTANCE.updateUserFromDto(partialUserDto, updatedUser);
         Set<ConstraintViolation<User>> violations = validator.validate(updatedUser);
         if (violations.isEmpty()) {
-            if (findAllUsers()
+            if (getUsers()
                     .stream()
                     .filter(user -> !user.getId().equals(updatedUser.getId()))
                     .noneMatch(user -> user.getEmail().equals(updatedUser.getEmail()))) {
@@ -74,5 +79,9 @@ public class UserServiceImpl implements UserService {
 
     private User getUser(Long id) {
         return userRepository.findUser(id).orElseThrow(() -> new UserNotFoundException("No user with ID: " + id));
+    }
+
+    private List<User> getUsers() {
+        return userRepository.findAllUsers();
     }
 }

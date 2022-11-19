@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserDtoList;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -32,7 +32,7 @@ public class UserController {
 
     @GetMapping
     @Operation(summary = "Get a list of all users")
-    public ResponseEntity<List<UserDto>> findAllUsers() {
+    public ResponseEntity<UserDtoList> findAllUsers() {
         log.info("Getting a list of all users");
         return ResponseEntity.ok(userService.findAllUsers());
     }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dao.ItemDao;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoList;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.exceptions.WrongUserException;
@@ -14,7 +15,7 @@ import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,11 +33,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> findAllItems(Long userId) {
-        return itemRepository.findAllItems(userId)
-                .stream()
-                .map(ItemMapper.INSTANCE::itemToItemDto)
-                .collect(Collectors.toList());
+    public ItemDtoList findAllItems(Long userId) {
+        return ItemDtoList.builder()
+                .itemDtoList(
+                        itemRepository.findAllItems(userId)
+                                .stream()
+                                .map(ItemMapper.INSTANCE::itemToItemDto)
+                                .collect(Collectors.toList())
+                ).build();
     }
 
     @Override
@@ -72,11 +76,18 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItems(String text) {
-        return itemRepository.searchItems(text)
-                .stream()
-                .map(ItemMapper.INSTANCE::itemToItemDto)
-                .collect(Collectors.toList());
+    public ItemDtoList searchItems(String text) {
+        if (!text.isBlank()) {
+            return ItemDtoList.builder()
+                    .itemDtoList(
+                            itemRepository.searchItems(text)
+                                    .stream()
+                                    .map(ItemMapper.INSTANCE::itemToItemDto)
+                                    .collect(Collectors.toList())
+                    ).build();
+        } else {
+            return ItemDtoList.builder().itemDtoList(new ArrayList<>()).build();
+        }
     }
 
     private Item getItem(Long id) {
