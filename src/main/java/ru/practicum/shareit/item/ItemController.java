@@ -17,16 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemMapper;
-import ru.practicum.shareit.item.exceptions.WrongUserException;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/items")
@@ -40,10 +36,7 @@ public class ItemController {
     @Operation(summary = "Get a list of all items that belong to specific user")
     public ResponseEntity<List<ItemDto>> findAllItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Getting a list of all items that belong to user with ID: " + userId);
-        return ResponseEntity.ok(itemService.findAllItems(userId)
-                .stream()
-                .map(ItemMapper.INSTANCE::itemToItemDto)
-                .collect(Collectors.toList()));
+        return ResponseEntity.ok(itemService.findAllItems(userId));
     }
 
     @GetMapping("/{id}")
@@ -53,7 +46,7 @@ public class ItemController {
             @PathVariable @Min(1) Long id
     ) {
         log.info("Getting item with ID: " + id + " that belongs to user " + userId);
-        return ResponseEntity.ok(ItemMapper.INSTANCE.itemToItemDto(itemService.findItem(id)));
+        return ResponseEntity.ok(itemService.findItem(id));
     }
 
     @GetMapping("/search")
@@ -61,10 +54,7 @@ public class ItemController {
     public ResponseEntity<List<ItemDto>> searchForItems(@RequestParam String text) {
         log.info("Searching for items, keyword: " + text);
         if (!text.isBlank()) {
-            return ResponseEntity.ok(itemService.searchItems(text.toUpperCase())
-                    .stream()
-                    .map(ItemMapper.INSTANCE::itemToItemDto)
-                    .collect(Collectors.toList()));
+            return ResponseEntity.ok(itemService.searchItems(text.toUpperCase()));
         } else {
             return ResponseEntity.ok(new ArrayList<>());
         }
@@ -79,28 +69,18 @@ public class ItemController {
         log.info("Creating item: " + itemDto + " for user with ID: " + userId);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(
-                        ItemMapper.INSTANCE.itemToItemDto(
-                                itemService.createItem(ItemMapper.INSTANCE.itemDtoToItem(itemDto), userId)
-                        )
-                );
+                .body((itemService.createItem(itemDto, userId)));
     }
 
     @PatchMapping("/{id}")
     @Operation(summary = "Update an item")
     public ResponseEntity<ItemDto> updateItem(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+            @RequestHeader("X-Sharer-User-Id") @Min(1) Long ownerId,
             @PathVariable @Min(1) Long id,
             @RequestBody ItemDto itemDto
     ) {
-        log.info("Updating item with ID: " + id + " that belongs to user with ID: " + userId);
-        Item item = itemService.findItem(id);
-        if (item.getOwner().getId().equals(userId)) {
-            ItemMapper.INSTANCE.updateItemFromDto(itemDto, item);
-            return ResponseEntity.ok().body(ItemMapper.INSTANCE.itemToItemDto(itemService.updateItem(item)));
-        } else {
-            throw new WrongUserException("Item does not belong to user with ID: " + item.getOwner().getId());
-        }
+        log.info("Updating item with ID: " + id + " that belongs to user with ID: " + ownerId);
+        return ResponseEntity.ok().body((itemService.updateItem(itemDto, id, ownerId)));
     }
 
     @DeleteMapping("/{id}")
