@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dao.ItemDao;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemDtoList;
+import ru.practicum.shareit.item.dto.ItemListDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.exceptions.WrongUserException;
@@ -33,8 +33,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDtoList findAllItems(Long userId) {
-        return ItemDtoList.builder()
+    public ItemListDto findAllItems(Long userId) {
+        return ItemListDto.builder()
                 .itemDtoList(
                         itemRepository.findAllItems(userId)
                                 .stream()
@@ -76,9 +76,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDtoList searchItems(String text) {
+    public ItemListDto searchItems(String text) {
         if (!text.isBlank()) {
-            return ItemDtoList.builder()
+            return ItemListDto.builder()
                     .itemDtoList(
                             itemRepository.searchItems(text)
                                     .stream()
@@ -86,7 +86,7 @@ public class ItemServiceImpl implements ItemService {
                                     .collect(Collectors.toList())
                     ).build();
         } else {
-            return ItemDtoList.builder().itemDtoList(new ArrayList<>()).build();
+            return ItemListDto.builder().itemDtoList(new ArrayList<>()).build();
         }
     }
 

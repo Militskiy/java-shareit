@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemDtoList;
+import ru.practicum.shareit.item.dto.ItemListDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
@@ -33,7 +33,7 @@ public class ItemController {
 
     @GetMapping
     @Operation(summary = "Get a list of all items that belong to specific user")
-    public ResponseEntity<ItemDtoList> findAllItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<ItemListDto> findAllItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Getting a list of all items that belong to user with ID: " + userId);
         return ResponseEntity.ok(itemService.findAllItems(userId));
     }
@@ -50,7 +50,7 @@ public class ItemController {
 
     @GetMapping("/search")
     @Operation(summary = "Search for items")
-    public ResponseEntity<ItemDtoList> searchForItems(@RequestParam String text) {
+    public ResponseEntity<ItemListDto> searchForItems(@RequestParam String text) {
         log.info("Searching for items, keyword: " + text);
         return ResponseEntity.ok(itemService.searchItems(text.toUpperCase()));
     }

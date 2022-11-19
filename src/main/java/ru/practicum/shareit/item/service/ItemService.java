@@ -1,12 +1,12 @@
 package ru.practicum.shareit.item.service;
 
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemDtoList;
+import ru.practicum.shareit.item.dto.ItemListDto;
 
 public interface ItemService {
     ItemDto findItem(Long id);
 
-    ItemDtoList findAllItems(Long userId);
+    ItemListDto findAllItems(Long userId);
 
     ItemDto createItem(ItemDto item, Long ownerId);
 
@@ -14,5 +14,5 @@ public interface ItemService {
 
     void deleteItem(Long id);
 
-    ItemDtoList searchItems(String text);
+    ItemListDto searchItems(String text);
 }
