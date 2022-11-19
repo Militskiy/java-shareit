@@ -21,31 +21,31 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<String> handleDuplicateEmailException(final DuplicateEmailException e) {
-        log.info(e.getMessage());
+        log.warn(e.getMessage());
         return ResponseEntity.status(409).body(e.getMessage());
     }
 
     @ExceptionHandler
     public ResponseEntity<String> handleUserNotFoundException(final UserNotFoundException e) {
-        log.info(e.getMessage());
+        log.warn(e.getMessage());
         return ResponseEntity.status(404).body(e.getMessage());
     }
 
     @ExceptionHandler
     public ResponseEntity<String> handleItemNotFoundException(final ItemNotFoundException e) {
-        log.info(e.getMessage());
+        log.warn(e.getMessage());
         return ResponseEntity.status(404).body(e.getMessage());
     }
 
     @ExceptionHandler
     public ResponseEntity<String> handleWrongUserException(final WrongUserException e) {
-        log.info(e.getMessage());
+        log.warn(e.getMessage());
         return ResponseEntity.status(403).body(e.getMessage());
     }
 
     @ExceptionHandler
     public ResponseEntity<String> handleThrowable(final Throwable e) {
-        log.info(ExceptionUtils.getStackTrace(e));
+        log.error(ExceptionUtils.getStackTrace(e));
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Unexpected error: " + e.getMessage());
@@ -53,13 +53,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<String> handleMissingRequestHeaderException(final MissingRequestHeaderException e) {
-        log.info(e.getMessage());
+        log.warn(e.getMessage());
         return ResponseEntity.status(400).body(e.getMessage());
     }
 
     @ExceptionHandler
     public ResponseEntity<String> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
-        log.info(String.format("Validation failed - field: %s, message: %s",
+        log.warn(String.format("Validation failed - field: %s, message: %s",
                 Objects.requireNonNull(e.getBindingResult().getFieldError()).getField(),
                 Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage()));
         return ResponseEntity.status(400).body(String.format("Validation failed - field: %s, message: %s",
