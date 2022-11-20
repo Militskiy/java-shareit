@@ -1,5 +1,7 @@
 package ru.practicum.shareit.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Value;
@@ -13,6 +15,7 @@ import javax.validation.constraints.NotBlank;
 @Jacksonized
 public class UserDto {
     @Schema(example = "1")
+    @JsonIgnore
     Long id;
     @Schema(example = "User")
     String name;
@@ -20,4 +23,9 @@ public class UserDto {
     @Email
     @Schema(example = "user@test.com")
     String email;
+
+    @JsonProperty
+    public Long getId() {
+        return id;
+    }
 }

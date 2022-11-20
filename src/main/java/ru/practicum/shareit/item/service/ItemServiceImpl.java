@@ -1,16 +1,19 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.item.dao.ItemDao;
+import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemListDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.exceptions.WrongUserException;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.dao.UserDao;
+import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
+import ru.practicum.shareit.user.model.User;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -23,8 +26,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemDao itemRepository;
-    private final UserDao userRepository;
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
     private final Validator validator;
 
     @Override
@@ -34,9 +37,17 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemListDto findAllItems(Long userId) {
+        ExampleMatcher searchByUserIdExampleMatcher = ExampleMatcher.matchingAny()
+                .withMatcher("owner", ExampleMatcher.GenericPropertyMatchers.exact())
+                .withIgnorePaths("id", "name", "description", "available", "request");
+        Example<Item> example = Example.of(
+                Item.builder()
+                        .owner(User.builder().id(userId).build())
+                        .build(), searchByUserIdExampleMatcher
+        );
         return ItemListDto.builder()
                 .itemDtoList(
-                        itemRepository.findAllItems(userId)
+                        itemRepository.findAll(example)
                                 .stream()
                                 .map(ItemMapper.INSTANCE::itemToItemDto)
                                 .collect(Collectors.toList())
@@ -47,9 +58,9 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto createItem(ItemDto itemDto, Long ownerId) {
         Item newItem = ItemMapper.INSTANCE.itemDtoToItem(itemDto);
         newItem.setOwner(userRepository
-                .findUser(ownerId)
+                .findById(ownerId)
                 .orElseThrow(() -> new UserNotFoundException("No user with ID: " + ownerId)));
-        return ItemMapper.INSTANCE.itemToItemDto(itemRepository.createItem(newItem));
+        return ItemMapper.INSTANCE.itemToItemDto(itemRepository.save(newItem));
     }
 
     @Override
@@ -60,7 +71,7 @@ public class ItemServiceImpl implements ItemService {
             ItemMapper.INSTANCE.updateItemFromDto(partialItemDto, updatedItem);
             Set<ConstraintViolation<Item>> violations = validator.validate(updatedItem);
             if (violations.isEmpty()) {
-                return ItemMapper.INSTANCE.itemToItemDto(itemRepository.updateItem(updatedItem));
+                return ItemMapper.INSTANCE.itemToItemDto(itemRepository.save(updatedItem));
             } else {
                 throw new ConstraintViolationException(violations);
             }
@@ -71,16 +82,26 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void deleteItem(Long id) {
-        findItem(id);
-        itemRepository.deleteItem(id);
+        itemRepository.deleteById(id);
     }
 
-    @Override
     public ItemListDto searchItems(String text) {
         if (!text.isBlank()) {
+            ExampleMatcher caseInsensitiveSearch = ExampleMatcher.matching()
+                    .withMatcher(
+                            "description", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase()
+                    )
+                    .withMatcher("available", ExampleMatcher.GenericPropertyMatchers.exact())
+                    .withIgnorePaths("id", "name", "owner", "request");
+            Example<Item> example = Example.of(
+                    Item.builder()
+                            .description(text)
+                            .available(Boolean.TRUE)
+                            .build(), caseInsensitiveSearch
+            );
             return ItemListDto.builder()
                     .itemDtoList(
-                            itemRepository.searchItems(text)
+                            itemRepository.findAll(example)
                                     .stream()
                                     .map(ItemMapper.INSTANCE::itemToItemDto)
                                     .collect(Collectors.toList())
@@ -91,6 +112,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Item getItem(Long id) {
-        return itemRepository.findItem(id).orElseThrow(() -> new ItemNotFoundException("No item with ID: " + id));
+        return itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("No item with ID: " + id));
     }
 }

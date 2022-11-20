@@ -2,7 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.dao.UserDao;
+import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserDtoList;
 import ru.practicum.shareit.user.dto.UserMapper;
@@ -21,8 +21,9 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserDao userRepository;
     private final Validator validator;
+
+    private final UserRepository userRepository;
 
     @Override
     public UserDto findUser(Long id) {
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService {
     public UserDto createUser(UserDto userDto) {
         User newUser = UserMapper.INSTANCE.userDtoToUser(userDto);
         if (getUsers().stream().noneMatch(user -> user.getEmail().equals(newUser.getEmail()))) {
-            return UserMapper.INSTANCE.userToUserDto(userRepository.createUser(newUser));
+            return UserMapper.INSTANCE.userToUserDto(userRepository.save(newUser));
         } else {
             throw new DuplicateEmailException("Email: " + newUser.getEmail() + " already exists");
         }
@@ -62,7 +63,7 @@ public class UserServiceImpl implements UserService {
                     .stream()
                     .filter(user -> !user.getId().equals(updatedUser.getId()))
                     .noneMatch(user -> user.getEmail().equals(updatedUser.getEmail()))) {
-                return UserMapper.INSTANCE.userToUserDto(userRepository.updateUser(updatedUser));
+                return UserMapper.INSTANCE.userToUserDto(userRepository.save(updatedUser));
             } else {
                 throw new DuplicateEmailException("Email: " + updatedUser.getEmail() + " already exists");
             }
@@ -73,15 +74,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
-        findUser(id);
-        userRepository.deleteUser(id);
+        userRepository.deleteById(id);
     }
 
     private User getUser(Long id) {
-        return userRepository.findUser(id).orElseThrow(() -> new UserNotFoundException("No user with ID: " + id));
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("No user with ID: " + id));
     }
 
     private List<User> getUsers() {
-        return userRepository.findAllUsers();
+        return userRepository.findAll();
     }
 }
