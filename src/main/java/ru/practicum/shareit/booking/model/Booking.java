@@ -35,7 +35,7 @@ public class Booking {
     @Id
     @Column(name = "booking_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @Temporal(value = TemporalType.TIMESTAMP)
     @Column(name = "start_time")
     private Date start;
@@ -56,7 +56,7 @@ public class Booking {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Booking booking = (Booking) o;
-        return getId() == booking.getId() && Objects.equal(getItem(), booking.getItem()) && Objects.equal(getBooker(), booking.getBooker());
+        return java.util.Objects.equals(getId(), booking.getId()) && Objects.equal(getItem(), booking.getItem()) && Objects.equal(getBooker(), booking.getBooker());
     }
 
     @Override

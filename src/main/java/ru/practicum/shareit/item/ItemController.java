@@ -23,6 +23,7 @@ import ru.practicum.shareit.item.service.ItemService;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
+
 @RestController
 @RequestMapping("/items")
 @Slf4j
@@ -30,10 +31,11 @@ import javax.validation.constraints.Min;
 @Tag(name = "Item services")
 public class ItemController {
     private final ItemService itemService;
+    private final static String OWNER_ID = "X-Sharer-User-Id";
 
     @GetMapping
     @Operation(summary = "Get a list of all items that belong to specific user")
-    public ResponseEntity<ItemListDto> findAllItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<ItemListDto> findAllItems(@RequestHeader(OWNER_ID) Long userId) {
         log.info("Getting a list of all items that belong to user with ID: " + userId);
         return ResponseEntity.ok(itemService.findAllItems(userId));
     }
@@ -41,7 +43,7 @@ public class ItemController {
     @GetMapping("/{id}")
     @Operation(summary = "Get an item")
     public ResponseEntity<ItemDto> findItem(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+            @RequestHeader(OWNER_ID) @Min(1) Long userId,
             @PathVariable @Min(1) Long id
     ) {
         log.info("Getting item with ID: " + id + " that belongs to user " + userId);
@@ -58,7 +60,7 @@ public class ItemController {
     @PostMapping
     @Operation(summary = "Add a new item")
     public ResponseEntity<ItemDto> createItem(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+            @RequestHeader(OWNER_ID) @Min(1) Long userId,
             @RequestBody @Valid ItemDto itemDto
     ) {
         log.info("Creating item: " + itemDto + " for user with ID: " + userId);
@@ -70,7 +72,7 @@ public class ItemController {
     @PatchMapping("/{id}")
     @Operation(summary = "Update an item")
     public ResponseEntity<ItemDto> updateItem(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long ownerId,
+            @RequestHeader(OWNER_ID) @Min(1) Long ownerId,
             @PathVariable @Min(1) Long id,
             @RequestBody ItemDto itemDto
     ) {
@@ -81,7 +83,7 @@ public class ItemController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete an item")
     public void deleteItem(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+            @RequestHeader(OWNER_ID) @Min(1) Long userId,
             @PathVariable @Min(1) Long id
     ) {
         log.info("Deleting item with ID: " + id + " that belongs to user with ID: " + userId);

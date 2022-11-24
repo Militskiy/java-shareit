@@ -1,14 +1,26 @@
 package ru.practicum.shareit.booking.dto;
 
+import org.mapstruct.BeanMapping;
+import org.mapstruct.InheritConfiguration;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.ReportingPolicy;
 import ru.practicum.shareit.booking.model.Booking;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface BookingMapper {
-    BookingMapper INSTANCE = Mappers.getMapper(BookingMapper.class);
+    @Mapping(source = "itemId", target = "item.id")
+    @Mapping(source = "itemName", target = "item.name")
+    @Mapping(source = "bookerId", target = "booker.id")
+    Booking bookingDtoToBooking(BookingDto bookingDto);
 
+    @InheritInverseConfiguration(name = "bookingDtoToBooking")
     BookingDto bookingToBookingDto(Booking booking);
 
-    Booking bookingDtoToBooking(BookingDto bookingDto);
+    @InheritConfiguration(name = "bookingDtoToBooking")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Booking updateBookingFromBookingDto(BookingDto bookingDto, @MappingTarget Booking booking);
 }

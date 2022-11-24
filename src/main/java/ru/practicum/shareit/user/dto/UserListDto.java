@@ -10,7 +10,7 @@ import java.util.List;
 @Value
 @Builder
 @Jacksonized
-public class UserDtoList {
+public class UserListDto {
     @JsonValue
     List<UserDto> userDtoList;
 }

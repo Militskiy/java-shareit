@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemListDto;
@@ -29,10 +30,11 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final Validator validator;
+    private final ItemMapper itemMapper;
 
     @Override
     public ItemDto findItem(Long id) {
-        return ItemMapper.INSTANCE.itemToItemDto(getItem(id));
+        return itemMapper.itemToItemDto(getItem(id));
     }
 
     @Override
@@ -49,29 +51,31 @@ public class ItemServiceImpl implements ItemService {
                 .itemDtoList(
                         itemRepository.findAll(example)
                                 .stream()
-                                .map(ItemMapper.INSTANCE::itemToItemDto)
+                                .map(itemMapper::itemToItemDto)
                                 .collect(Collectors.toList())
                 ).build();
     }
 
     @Override
+    @Transactional
     public ItemDto createItem(ItemDto itemDto, Long ownerId) {
-        Item newItem = ItemMapper.INSTANCE.itemDtoToItem(itemDto);
+        Item newItem = itemMapper.itemDtoToItem(itemDto);
         newItem.setOwner(userRepository
                 .findById(ownerId)
                 .orElseThrow(() -> new UserNotFoundException("No user with ID: " + ownerId)));
-        return ItemMapper.INSTANCE.itemToItemDto(itemRepository.save(newItem));
+        return itemMapper.itemToItemDto(itemRepository.save(newItem));
     }
 
     @Override
+    @Transactional
     public ItemDto updateItem(ItemDto partialItemDto, Long itemId, Long ownerId) {
         Item targetItem = getItem(itemId);
         Item updatedItem = targetItem.toBuilder().build();
         if (updatedItem.getOwner().getId().equals(ownerId)) {
-            ItemMapper.INSTANCE.updateItemFromDto(partialItemDto, updatedItem);
+            itemMapper.updateItemFromDto(partialItemDto, updatedItem);
             Set<ConstraintViolation<Item>> violations = validator.validate(updatedItem);
             if (violations.isEmpty()) {
-                return ItemMapper.INSTANCE.itemToItemDto(itemRepository.save(updatedItem));
+                return itemMapper.itemToItemDto(itemRepository.save(updatedItem));
             } else {
                 throw new ConstraintViolationException(violations);
             }
@@ -81,6 +85,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public void deleteItem(Long id) {
         itemRepository.deleteById(id);
     }
@@ -88,9 +93,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemListDto searchItems(String text) {
         if (!text.isBlank()) {
             ExampleMatcher caseInsensitiveSearch = ExampleMatcher.matching()
-                    .withMatcher(
-                            "description", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase()
-                    )
+                    .withMatcher("description", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
                     .withMatcher("available", ExampleMatcher.GenericPropertyMatchers.exact())
                     .withIgnorePaths("id", "name", "owner", "request");
             Example<Item> example = Example.of(
@@ -103,7 +106,7 @@ public class ItemServiceImpl implements ItemService {
                     .itemDtoList(
                             itemRepository.findAll(example)
                                     .stream()
-                                    .map(ItemMapper.INSTANCE::itemToItemDto)
+                                    .map(itemMapper::itemToItemDto)
                                     .collect(Collectors.toList())
                     ).build();
         } else {

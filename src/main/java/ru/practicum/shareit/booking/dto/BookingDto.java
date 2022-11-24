@@ -4,19 +4,22 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 import ru.practicum.shareit.booking.model.Status;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
 
-import java.time.LocalDateTime;
+import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
+import java.util.Date;
+
 
 @Value
 @Builder
 @Jacksonized
-public class BookingDto {
-    long id;
-    LocalDateTime start;
-    LocalDateTime end;
-    Item item;
-    User booker;
+public class BookingDto implements Serializable {
+    Long id;
+    Date start;
+    Date end;
+    Long itemId;
+    @NotBlank
+    String itemName;
+    Long bookerId;
     Status status;
 }

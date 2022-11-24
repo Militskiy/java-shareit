@@ -9,12 +9,12 @@ import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.io.Serializable;
 
 @Value
 @Builder
 @Jacksonized
-public class UserDto {
-    @Schema(example = "1")
+public class UserDto implements Serializable {
     @JsonIgnore
     Long id;
     @Schema(example = "User")
