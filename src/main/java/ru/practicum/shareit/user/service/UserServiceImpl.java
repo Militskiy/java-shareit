@@ -41,32 +41,28 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto createUser(UserDto userDto) {
-        User newUser = userMapper.userDtoToUser(userDto);
-        if (userRepository.findAll().stream().noneMatch(user -> user.getEmail().equals(newUser.getEmail()))) {
-            return userMapper.userToUserDto(userRepository.save(newUser));
+        if (!userRepository.existsByEmail(userDto.getEmail())) {
+            return userMapper.userToUserDto(userRepository.save(userMapper.userDtoToUser(userDto)));
         } else {
-            throw new DuplicateEmailException("Email: " + newUser.getEmail() + " already exists");
+            throw new DuplicateEmailException("Email: " + userDto.getEmail() + " already exists");
         }
     }
 
     @Override
     @Transactional
     public UserDto updateUser(UserDto partialUserDto, Long userId) {
-        User targetUser = getUser(userId);
-        User updatedUser = targetUser.toBuilder().build();
-        userMapper.updateUserFromDto(partialUserDto, updatedUser);
-        Set<ConstraintViolation<User>> violations = validator.validate(updatedUser);
-        if (violations.isEmpty()) {
-            if (userRepository.findAll()
-                    .stream()
-                    .filter(user -> !user.getId().equals(updatedUser.getId()))
-                    .noneMatch(user -> user.getEmail().equals(updatedUser.getEmail()))) {
+        if (userRepository.findByEmailAndIdIsNot(partialUserDto.getEmail(), userId).isEmpty()) {
+            User targetUser = getUser(userId);
+            User updatedUser = targetUser.toBuilder().build();
+            userMapper.updateUserFromDto(partialUserDto, updatedUser);
+            Set<ConstraintViolation<User>> violations = validator.validate(updatedUser);
+            if (violations.isEmpty()) {
                 return userMapper.userToUserDto(userRepository.save(updatedUser));
             } else {
-                throw new DuplicateEmailException("Email: " + updatedUser.getEmail() + " already exists");
+                throw new ConstraintViolationException(violations);
             }
         } else {
-            throw new ConstraintViolationException(violations);
+            throw new DuplicateEmailException("Email: " + partialUserDto.getEmail() + " already exists");
         }
     }
 
