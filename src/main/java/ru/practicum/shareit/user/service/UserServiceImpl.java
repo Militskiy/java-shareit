@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +32,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserListDto findAllUsers(PageRequest pageRequest) {
-        return UserListDto.builder()
-                .userDtoList(getUsers(pageRequest).map(userMapper::userToUserDto).toList()).
-                build();
+        return UserListDto
+                .builder()
+                .userDtoList(userMapper.map(userRepository.findAll(pageRequest)))
+                .build();
     }
 
     @Override
@@ -73,9 +73,5 @@ public class UserServiceImpl implements UserService {
 
     private User getUser(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("No user with ID: " + id));
-    }
-
-    private Page<User> getUsers(PageRequest pageRequest) {
-        return userRepository.findAll(pageRequest);
     }
 }
