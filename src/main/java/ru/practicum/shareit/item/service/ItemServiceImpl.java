@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.dao.ItemRepository;
@@ -18,7 +19,6 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,15 +35,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemListDto findAllItems(Long ownerId) {
+    public ItemListDto findAllItems(Long ownerId, PageRequest pageRequest) {
         if (userRepository.existsById(ownerId)) {
             return ItemListDto.builder()
-                    .itemDtoList(
-                            itemRepository.findAllByOwnerId(ownerId)
-                                    .stream()
-                                    .map(itemMapper::itemToItemDto)
-                                    .collect(Collectors.toList())
-                    ).build();
+                    .itemDtoList(itemMapper.map(itemRepository.findAllByOwnerId(ownerId, pageRequest)))
+                    .build();
         } else {
             throw new UserNotFoundException("No user with ID: " + ownerId);
         }
@@ -84,15 +80,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemListDto searchItems(String text) {
+    public ItemListDto searchItems(String text, PageRequest pageRequest) {
         if (!text.isBlank()) {
             return ItemListDto.builder()
-                    .itemDtoList(
-                            itemRepository.findAllByDescriptionContainingIgnoreCaseAndAvailableIsTrue(text)
-                                    .stream()
-                                    .map(itemMapper::itemToItemDto)
-                                    .collect(Collectors.toList())
-                    ).build();
+                    .itemDtoList(itemMapper.map(
+                            itemRepository.findAllByDescriptionContainingIgnoreCaseAndAvailableIsTrue(text, pageRequest)
+                    ))
+                    .build();
         } else {
             return ItemListDto.builder().itemDtoList(new ArrayList<>()).build();
         }

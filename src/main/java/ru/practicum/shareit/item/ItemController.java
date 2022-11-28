@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,9 +36,13 @@ public class ItemController {
 
     @GetMapping
     @Operation(summary = "Get a list of all items that belong to specific user")
-    public ResponseEntity<ItemListDto> findAllItems(@RequestHeader(HEADER_OWNER_ID) Long userId) {
+    public ResponseEntity<ItemListDto> findAllItems(
+            @RequestHeader(HEADER_OWNER_ID) @Min(1) Long userId,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize
+    ) {
         log.info("Getting a list of all items that belong to user with ID: " + userId);
-        return ResponseEntity.ok(itemService.findAllItems(userId));
+        return ResponseEntity.ok(itemService.findAllItems(userId, PageRequest.of(pageNo, pageSize)));
     }
 
     @GetMapping("/{id}")
@@ -51,9 +56,13 @@ public class ItemController {
 
     @GetMapping("/search")
     @Operation(summary = "Search for items")
-    public ResponseEntity<ItemListDto> searchForItems(@RequestParam String text) {
+    public ResponseEntity<ItemListDto> searchForItems(
+            @RequestParam String text,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize
+    ) {
         log.info("Searching for items, keyword: " + text);
-        return ResponseEntity.ok(itemService.searchItems(text.toUpperCase()));
+        return ResponseEntity.ok(itemService.searchItems(text.toUpperCase(), PageRequest.of(pageNo, pageSize)));
     }
 
     @PostMapping

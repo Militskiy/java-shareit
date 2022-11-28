@@ -1,12 +1,13 @@
 package ru.practicum.shareit.item.service;
 
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemListDto;
 
 public interface ItemService {
     ItemDto findItem(Long id);
 
-    ItemListDto findAllItems(Long userId);
+    ItemListDto findAllItems(Long userId, PageRequest pageRequest);
 
     ItemDto createItem(ItemDto item, Long ownerId);
 
@@ -14,5 +15,5 @@ public interface ItemService {
 
     void deleteItem(Long id);
 
-    ItemListDto searchItems(String text);
+    ItemListDto searchItems(String text, PageRequest pageRequest);
 }
