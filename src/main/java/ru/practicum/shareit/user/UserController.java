@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserListDto;
 import ru.practicum.shareit.user.service.UserService;
@@ -60,10 +61,10 @@ public class UserController {
     @Operation(summary = "Update user")
     public ResponseEntity<UserDto> updateUser(
             @PathVariable @Min(1) Long id,
-            @RequestBody UserDto userDto
+            @RequestBody @Valid UpdateUserDto updateUserDto
     ) {
         log.info("Updating user with ID: " + id);
-        return ResponseEntity.ok(userService.updateUser(userDto, id));
+        return ResponseEntity.ok(userService.updateUser(updateUserDto, id));
     }
 
     @DeleteMapping("/{id}")

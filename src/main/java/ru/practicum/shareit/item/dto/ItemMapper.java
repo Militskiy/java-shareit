@@ -20,5 +20,5 @@ public interface ItemMapper {
     List<ItemDto> map(Page<Item> items);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateItemFromDto(ItemDto itemDto, @MappingTarget Item item);
+    Item updateItemFromUpdateItemDto(UpdateItemDto updateItemDto, @MappingTarget Item item);
 }

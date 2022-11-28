@@ -6,23 +6,20 @@ import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 @Valid
 @Value
 @Builder
 @Jacksonized
-public class ItemDto implements Serializable {
-    Long id;
-    @NotBlank
+public class UpdateItemDto implements Serializable {
+
+    @Pattern(regexp = "^[^ ].*[^ .]$", message = "Name cannot be empty")
     @Schema(example = "Item")
     String name;
-    @NotBlank
+    @Pattern(regexp = "^[^ ].*[^ .]$", message = "Description cannot be empty")
     @Schema(example = "Test item")
     String description;
-    @NotNull
-    @Schema(example = "true")
     Boolean available;
 }

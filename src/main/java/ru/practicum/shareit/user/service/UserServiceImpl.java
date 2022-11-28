@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.user.dao.UserRepository;
+import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserListDto;
 import ru.practicum.shareit.user.dto.UserMapper;
@@ -12,16 +13,9 @@ import ru.practicum.shareit.user.exceptions.DuplicateEmailException;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-import java.util.Set;
-
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
-
-    private final Validator validator;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
@@ -50,19 +44,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDto updateUser(UserDto partialUserDto, Long userId) {
-        if (userRepository.findByEmailAndIdIsNot(partialUserDto.getEmail(), userId).isEmpty()) {
+    public UserDto updateUser(UpdateUserDto updateUserDto, Long userId) {
+        if (userRepository.findByEmailAndIdIsNot(updateUserDto.getEmail(), userId).isEmpty()) {
             User targetUser = getUser(userId);
-            User updatedUser = targetUser.toBuilder().build();
-            userMapper.updateUserFromDto(partialUserDto, updatedUser);
-            Set<ConstraintViolation<User>> violations = validator.validate(updatedUser);
-            if (violations.isEmpty()) {
-                return userMapper.userToUserDto(userRepository.save(updatedUser));
-            } else {
-                throw new ConstraintViolationException(violations);
-            }
+            return userMapper.userToUserDto(
+                    userRepository.save(userMapper.updateUserFromUpdateUserDto(updateUserDto, targetUser))
+            );
         } else {
-            throw new DuplicateEmailException("Email: " + partialUserDto.getEmail() + " already exists");
+            throw new DuplicateEmailException("Email: " + updateUserDto.getEmail() + " already exists");
         }
     }
 

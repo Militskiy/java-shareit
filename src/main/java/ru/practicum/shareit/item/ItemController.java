@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemListDto;
+import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
@@ -82,10 +83,10 @@ public class ItemController {
     public ResponseEntity<ItemDto> updateItem(
             @RequestHeader(HEADER_OWNER_ID) @Min(1) Long ownerId,
             @PathVariable @Min(1) Long id,
-            @RequestBody ItemDto itemDto
+            @RequestBody @Valid UpdateItemDto updateItemDto
     ) {
         log.info("Updating item with ID: " + id + " that belongs to user with ID: " + ownerId);
-        return ResponseEntity.ok().body((itemService.updateItem(itemDto, id, ownerId)));
+        return ResponseEntity.ok().body((itemService.updateItem(updateItemDto, id, ownerId)));
     }
 
     @DeleteMapping("/{id}")

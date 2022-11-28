@@ -8,25 +8,20 @@ import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemListDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.exceptions.WrongUserException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
 import java.util.ArrayList;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
-    private final Validator validator;
     private final ItemMapper itemMapper;
 
     @Override
@@ -57,17 +52,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ItemDto updateItem(ItemDto partialItemDto, Long itemId, Long ownerId) {
+    public ItemDto updateItem(UpdateItemDto updateItemDto, Long itemId, Long ownerId) {
         Item targetItem = getItem(itemId);
-        Item updatedItem = targetItem.toBuilder().build();
-        if (updatedItem.getOwner().getId().equals(ownerId)) {
-            itemMapper.updateItemFromDto(partialItemDto, updatedItem);
-            Set<ConstraintViolation<Item>> violations = validator.validate(updatedItem);
-            if (violations.isEmpty()) {
-                return itemMapper.itemToItemDto(itemRepository.save(updatedItem));
-            } else {
-                throw new ConstraintViolationException(violations);
-            }
+        if (targetItem.getOwner().getId().equals(ownerId)) {
+            return itemMapper.itemToItemDto(
+                    itemRepository.save(itemMapper.updateItemFromUpdateItemDto(updateItemDto, targetItem))
+            );
         } else {
             throw new WrongUserException("Item does not belong to user with ID: " + ownerId);
         }
