@@ -17,7 +17,7 @@ import java.io.Serializable;
 public class UpdateUserDto implements Serializable {
 
     @Schema(example = "User")
-    @Pattern(regexp = "^[^ ].*[^ .]$", message = "Name cannot be empty")
+    @Pattern(regexp = "^[^ ].*[^ .]$", message = "Name is not valid")
     String name;
     @Email
     @Schema(example = "user@test.com")

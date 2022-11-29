@@ -12,5 +12,5 @@ import java.util.List;
 @Jacksonized
 public class ItemListDto {
     @JsonValue
-    List<ItemDto> itemDtoList;
+    List<ResponseItemDto> items;
 }

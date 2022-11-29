@@ -8,6 +8,7 @@ import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemListDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.dto.ResponseItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.exceptions.WrongUserException;
@@ -25,15 +26,15 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
 
     @Override
-    public ItemDto findItem(Long id) {
-        return itemMapper.itemToItemDto(getItem(id));
+    public ResponseItemDto findItem(Long id) {
+        return itemMapper.itemToResponseItemDto(getItem(id));
     }
 
     @Override
     public ItemListDto findAllItems(Long ownerId, PageRequest pageRequest) {
         if (userRepository.existsById(ownerId)) {
             return ItemListDto.builder()
-                    .itemDtoList(itemMapper.map(itemRepository.findAllByOwnerId(ownerId, pageRequest)))
+                    .items(itemMapper.map(itemRepository.findAllByOwnerId(ownerId, pageRequest)))
                     .build();
         } else {
             throw new UserNotFoundException("No user with ID: " + ownerId);
@@ -42,20 +43,20 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ItemDto createItem(ItemDto itemDto, Long ownerId) {
+    public ResponseItemDto createItem(ItemDto itemDto, Long ownerId) {
         Item newItem = itemMapper.itemDtoToItem(itemDto);
         newItem.setOwner(userRepository
                 .findById(ownerId)
                 .orElseThrow(() -> new UserNotFoundException("No user with ID: " + ownerId)));
-        return itemMapper.itemToItemDto(itemRepository.save(newItem));
+        return itemMapper.itemToResponseItemDto(itemRepository.save(newItem));
     }
 
     @Override
     @Transactional
-    public ItemDto updateItem(UpdateItemDto updateItemDto, Long itemId, Long ownerId) {
+    public ResponseItemDto updateItem(UpdateItemDto updateItemDto, Long itemId, Long ownerId) {
         Item targetItem = getItem(itemId);
         if (targetItem.getOwner().getId().equals(ownerId)) {
-            return itemMapper.itemToItemDto(
+            return itemMapper.itemToResponseItemDto(
                     itemRepository.save(itemMapper.updateItemFromUpdateItemDto(updateItemDto, targetItem))
             );
         } else {
@@ -73,12 +74,12 @@ public class ItemServiceImpl implements ItemService {
     public ItemListDto searchItems(String text, PageRequest pageRequest) {
         if (!text.isBlank()) {
             return ItemListDto.builder()
-                    .itemDtoList(itemMapper.map(
+                    .items(itemMapper.map(
                             itemRepository.findAllByDescriptionContainingIgnoreCaseAndAvailableIsTrue(text, pageRequest)
                     ))
                     .build();
         } else {
-            return ItemListDto.builder().itemDtoList(new ArrayList<>()).build();
+            return ItemListDto.builder().items(new ArrayList<>()).build();
         }
     }
 

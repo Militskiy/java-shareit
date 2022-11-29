@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemListDto;
+import ru.practicum.shareit.item.dto.ResponseItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
@@ -32,8 +33,8 @@ import javax.validation.constraints.Min;
 @RequiredArgsConstructor
 @Tag(name = "Item services")
 public class ItemController {
+    private static final String HEADER_OWNER_ID = "X-Sharer-User-Id";
     private final ItemService itemService;
-    private final static String HEADER_OWNER_ID = "X-Sharer-User-Id";
 
     @GetMapping
     @Operation(summary = "Get a list of all items that belong to specific user")
@@ -48,7 +49,7 @@ public class ItemController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get an item")
-    public ResponseEntity<ItemDto> findItem(
+    public ResponseEntity<ResponseItemDto> findItem(
             @PathVariable @Min(1) Long id
     ) {
         log.info("Getting item with ID: " + id);
@@ -68,7 +69,7 @@ public class ItemController {
 
     @PostMapping
     @Operation(summary = "Add a new item")
-    public ResponseEntity<ItemDto> createItem(
+    public ResponseEntity<ResponseItemDto> createItem(
             @RequestHeader(HEADER_OWNER_ID) @Min(1) Long userId,
             @RequestBody @Valid ItemDto itemDto
     ) {
@@ -80,7 +81,7 @@ public class ItemController {
 
     @PatchMapping("/{id}")
     @Operation(summary = "Update an item")
-    public ResponseEntity<ItemDto> updateItem(
+    public ResponseEntity<ResponseItemDto> updateItem(
             @RequestHeader(HEADER_OWNER_ID) @Min(1) Long ownerId,
             @PathVariable @Min(1) Long id,
             @RequestBody @Valid UpdateItemDto updateItemDto

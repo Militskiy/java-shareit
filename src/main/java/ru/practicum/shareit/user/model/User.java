@@ -1,12 +1,12 @@
 package ru.practicum.shareit.user.model;
 
-import com.google.common.base.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.Hibernate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -41,13 +42,13 @@ public class User {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         User user = (User) o;
-        return Objects.equal(getId(), user.getId());
+        return id != null && Objects.equals(id, user.getId());
     }
 
     @Override
     public int hashCode() {
-        return 99;
+        return getClass().hashCode();
     }
 }

@@ -1,12 +1,12 @@
 package ru.practicum.shareit.request.model;
 
-import com.google.common.base.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.Hibernate;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.Column;
@@ -20,6 +20,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -32,7 +33,7 @@ public class ItemRequest {
     @Id
     @Column(name = "request_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @Column(name = "request_description")
     private String description;
     @ManyToOne
@@ -44,13 +45,13 @@ public class ItemRequest {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         ItemRequest that = (ItemRequest) o;
-        return getId() == that.getId() && Objects.equal(getRequester(), that.getRequester());
+        return id != null && Objects.equals(id, that.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getRequester());
+        return getClass().hashCode();
     }
 }

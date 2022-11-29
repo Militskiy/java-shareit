@@ -1,12 +1,12 @@
 package ru.practicum.shareit.item.model;
 
-import com.google.common.base.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.Hibernate;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
@@ -18,8 +18,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -32,11 +32,11 @@ public class Item {
     @Id
     @Column(name = "item_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    @NotBlank
+    private Long id;
+    @NotNull
     @Column(name = "item_name")
     private String name;
-    @NotBlank
+    @NotNull
     private String description;
     @NotNull
     private Boolean available;
@@ -51,13 +51,13 @@ public class Item {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         Item item = (Item) o;
-        return getId() == item.getId() && Objects.equal(getOwner(), item.getOwner());
+        return id != null && Objects.equals(id, item.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getOwner());
+        return getClass().hashCode();
     }
 }

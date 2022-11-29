@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.user.dto.ResponseUserDto;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserListDto;
@@ -45,21 +46,21 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a specific user")
-    public ResponseEntity<UserDto> findUser(@PathVariable @Min(1) Long id) {
+    public ResponseEntity<ResponseUserDto> findUser(@PathVariable @Min(1) Long id) {
         log.info("Getting a user with ID: {}", id);
         return ResponseEntity.ok(userService.findUser(id));
     }
 
     @PostMapping
     @Operation(summary = "Creates a new user")
-    public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserDto userDto) {
+    public ResponseEntity<ResponseUserDto> createUser(@RequestBody @Valid UserDto userDto) {
         log.info("Creating a new user: {}", userDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userDto));
     }
 
     @PatchMapping("/{id}")
     @Operation(summary = "Update user")
-    public ResponseEntity<UserDto> updateUser(
+    public ResponseEntity<ResponseUserDto> updateUser(
             @PathVariable @Min(1) Long id,
             @RequestBody @Valid UpdateUserDto updateUserDto
     ) {

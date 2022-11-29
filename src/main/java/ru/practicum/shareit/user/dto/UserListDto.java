@@ -12,5 +12,5 @@ import java.util.List;
 @Jacksonized
 public class UserListDto {
     @JsonValue
-    List<UserDto> userDtoList;
+    List<ResponseUserDto> userDtoList;
 }

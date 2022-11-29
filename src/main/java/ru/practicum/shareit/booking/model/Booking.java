@@ -1,12 +1,12 @@
 package ru.practicum.shareit.booking.model;
 
-import com.google.common.base.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.Hibernate;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -23,6 +23,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -54,13 +55,13 @@ public class Booking {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         Booking booking = (Booking) o;
-        return java.util.Objects.equals(getId(), booking.getId()) && Objects.equal(getItem(), booking.getItem()) && Objects.equal(getBooker(), booking.getBooker());
+        return id != null && Objects.equals(id, booking.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getItem(), getBooker());
+        return getClass().hashCode();
     }
 }

@@ -13,12 +13,12 @@ import java.util.List;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface ItemMapper {
 
-    ItemDto itemToItemDto(Item item);
-
     Item itemDtoToItem(ItemDto itemDto);
 
-    List<ItemDto> map(Page<Item> items);
+    List<ResponseItemDto> map(Page<Item> items);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Item updateItemFromUpdateItemDto(UpdateItemDto updateItemDto, @MappingTarget Item item);
+
+    ResponseItemDto itemToResponseItemDto(Item item);
 }
