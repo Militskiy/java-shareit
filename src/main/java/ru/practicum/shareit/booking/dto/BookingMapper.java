@@ -1,26 +1,44 @@
 package ru.practicum.shareit.booking.dto;
 
 import org.mapstruct.BeanMapping;
-import org.mapstruct.InheritConfiguration;
-import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.data.domain.Page;
 import ru.practicum.shareit.booking.model.Booking;
+
+import java.util.List;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface BookingMapper {
-    @Mapping(source = "itemId", target = "item.id")
-    @Mapping(source = "itemName", target = "item.name")
-    @Mapping(source = "bookerId", target = "booker.id")
-    Booking bookingDtoToBooking(BookingDto bookingDto);
+    Booking bookingResponseDtoToBooking(BookingResponseDto bookingResponseDto);
 
-    @InheritInverseConfiguration(name = "bookingDtoToBooking")
-    BookingDto bookingToBookingDto(Booking booking);
+    BookingResponseDto bookingToBookingResponseDto(Booking booking);
 
-    @InheritConfiguration(name = "bookingDtoToBooking")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Booking updateBookingFromBookingDto(BookingDto bookingDto, @MappingTarget Booking booking);
+    Booking updateBookingFromBookingResponseDto(BookingResponseDto bookingResponseDto, @MappingTarget Booking booking);
+
+    @Mapping(source = "itemId", target = "item.id")
+    Booking bookingCreateDtoToBooking(BookingCreateDto bookingCreateDto);
+
+    @Mapping(source = "item.id", target = "itemId")
+    BookingCreateDto bookingToBookingCreateDto(Booking booking);
+
+    @Mapping(source = "itemId", target = "item.id")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Booking updateBookingFromBookingCreateDto(BookingCreateDto bookingCreateDto, @MappingTarget Booking booking);
+
+    List<BookingResponseDto> map(Page<Booking> bookings);
+
+    @Mapping(source = "bookerId", target = "booker.id")
+    Booking bookingShortDtoToBooking(BookingShortDto bookingShortDto);
+
+    @Mapping(source = "booker.id", target = "bookerId")
+    BookingShortDto bookingToBookingShortDto(Booking booking);
+
+    @Mapping(source = "bookerId", target = "booker.id")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Booking updateBookingFromBookingShortDto(BookingShortDto bookingShortDto, @MappingTarget Booking booking);
 }

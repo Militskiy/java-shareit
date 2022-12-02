@@ -1,6 +1,6 @@
-package ru.practicum.shareit.user.annotations;
+package ru.practicum.shareit.booking.annotations;
 
-import ru.practicum.shareit.user.validators.EmailValidator;
+import ru.practicum.shareit.booking.validators.BookingEndTimeValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -11,11 +11,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Documented
-@Constraint(validatedBy = EmailValidator.class)
-@Target({ElementType.FIELD})
+@Constraint(validatedBy = BookingEndTimeValidator.class)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UniqueEmail {
-    String message() default "Email must be unique";
+public @interface EndAfterStart {
+    String message() default "Booking end time cannot be before start time";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

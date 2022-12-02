@@ -11,6 +11,9 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
+/**
+ * A DTO for the {@link ru.practicum.shareit.item.model.Item} entity
+ */
 @Valid
 @Value
 @Builder

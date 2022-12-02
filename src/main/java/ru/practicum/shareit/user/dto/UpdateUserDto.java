@@ -10,6 +10,9 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
+/**
+ * A DTO for the {@link ru.practicum.shareit.user.model.User} entity
+ */
 @Valid
 @Value
 @Builder

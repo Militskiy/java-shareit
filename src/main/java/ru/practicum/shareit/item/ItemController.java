@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemListDto;
+import ru.practicum.shareit.item.dto.ItemListWithBookingsDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import ru.practicum.shareit.item.dto.ResponseItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -38,7 +40,7 @@ public class ItemController {
 
     @GetMapping
     @Operation(summary = "Get a list of all items that belong to specific user")
-    public ResponseEntity<ItemListDto> findAllItems(
+    public ResponseEntity<ItemListWithBookingsDto> findAllItems(
             @RequestHeader(HEADER_OWNER_ID) @Min(1) Long userId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize
@@ -49,11 +51,12 @@ public class ItemController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get an item")
-    public ResponseEntity<ResponseItemDto> findItem(
+    public ResponseEntity<ItemWithBookingsDto> findItem(
+            @RequestHeader(HEADER_OWNER_ID) @Min(1) Long userId,
             @PathVariable @Min(1) Long id
     ) {
         log.info("Getting item with ID: " + id);
-        return ResponseEntity.ok(itemService.findItem(id));
+        return ResponseEntity.ok(itemService.findItem(id, userId));
     }
 
     @GetMapping("/search")

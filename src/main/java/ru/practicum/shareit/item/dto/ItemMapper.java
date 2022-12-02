@@ -15,10 +15,19 @@ public interface ItemMapper {
 
     Item itemDtoToItem(ItemDto itemDto);
 
-    List<ResponseItemDto> map(Page<Item> items);
+    List<ResponseItemDto> mapResponse(Page<Item> items);
+
+    List<ItemWithBookingsDto> mapWithBooking(Page<Item> items);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Item updateItemFromUpdateItemDto(UpdateItemDto updateItemDto, @MappingTarget Item item);
 
     ResponseItemDto itemToResponseItemDto(Item item);
+
+    Item itemWithBookingsDtoToItem(ItemWithBookingsDto itemWithBookingsDto);
+
+    ItemWithBookingsDto itemToItemWithBookingsDto(Item item);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Item updateItemFromItemWithBookingsDto(ItemWithBookingsDto itemWithBookingsDto, @MappingTarget Item item);
 }

@@ -20,9 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -37,12 +35,10 @@ public class Booking {
     @Column(name = "booking_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Temporal(value = TemporalType.TIMESTAMP)
     @Column(name = "start_time")
-    private Date start;
-    @Temporal(value = TemporalType.TIMESTAMP)
+    private LocalDateTime start;
     @Column(name = "end_time")
-    private Date end;
+    private LocalDateTime end;
     @ManyToOne
     @JoinColumn(name = "item_id")
     private Item item;

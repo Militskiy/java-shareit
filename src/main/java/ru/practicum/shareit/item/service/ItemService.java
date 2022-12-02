@@ -3,13 +3,15 @@ package ru.practicum.shareit.item.service;
 import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemListDto;
+import ru.practicum.shareit.item.dto.ItemListWithBookingsDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import ru.practicum.shareit.item.dto.ResponseItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
 
 public interface ItemService {
-    ResponseItemDto findItem(Long id);
+    ItemWithBookingsDto findItem(Long id, Long userId);
 
-    ItemListDto findAllItems(Long userId, PageRequest pageRequest);
+    ItemListWithBookingsDto findAllItems(Long userId, PageRequest pageRequest);
 
     ResponseItemDto createItem(ItemDto item, Long ownerId);
 

@@ -9,5 +9,6 @@ import ru.practicum.shareit.item.model.Item;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
     Page<Item> findAllByDescriptionContainingIgnoreCaseAndAvailableIsTrue(String text, Pageable pageable);
+
     Page<Item> findAllByOwnerId(Long ownerId, Pageable pageable);
 }

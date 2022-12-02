@@ -11,16 +11,19 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
+/**
+ * A DTO for the {@link ru.practicum.shareit.user.model.User} entity
+ */
 @Valid
 @Value
 @Builder
 @Jacksonized
 public class UserDto implements Serializable {
-    @NotNull
-    @Pattern(regexp = "^[^ ].*[^ .]$", message = "Name is not valid")
+    @NotNull(message = "name must not be null")
+    @Pattern(regexp = "^[^ ].*[^ .]$", message = "name is not valid")
     @Schema(example = "User")
     String name;
-    @NotNull
+    @NotNull(message = "email must not be null")
     @Email
     @Schema(example = "user@test.com")
     String email;

@@ -16,6 +16,7 @@ import ru.practicum.shareit.user.model.User;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -36,11 +37,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ResponseUserDto createUser(UserDto userDto) {
-        if (!userRepository.existsByEmail(userDto.getEmail())) {
-            return userMapper.userToResponseUserDto(userRepository.save(userMapper.userDtoToUser(userDto)));
-        } else {
-            throw new DuplicateEmailException("Email: " + userDto.getEmail() + " already exists");
-        }
+//        if (!userRepository.existsByEmail(userDto.getEmail())) {
+//            return userMapper.userToResponseUserDto(userRepository.save(userMapper.userDtoToUser(userDto)));
+//        } else {
+//            throw new DuplicateEmailException("Email: " + userDto.getEmail() + " already exists");
+//        }
+        return userMapper.userToResponseUserDto(userRepository.save(userMapper.userDtoToUser(userDto)));
+
     }
 
     @Override
@@ -57,6 +60,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }

@@ -1,6 +1,5 @@
-package ru.practicum.shareit.user.model;
+package ru.practicum.shareit.item.model;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,35 +13,27 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
-@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@Builder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "users")
-public class User {
-
+@Entity
+@Table(name = "comments")
+public class Comment {
     @Id
-    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comment_id", nullable = false)
     private Long id;
-    @NotNull
-    @Column(name = "user_name")
-    private String name;
-    @NotNull
-    @Column(unique = true)
-    private String email;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        User user = (User) o;
-        return id != null && Objects.equals(id, user.getId());
+        Comment comment = (Comment) o;
+        return id != null && Objects.equals(id, comment.getId());
     }
 
     @Override

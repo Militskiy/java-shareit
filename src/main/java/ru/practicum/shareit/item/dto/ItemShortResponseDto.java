@@ -10,9 +10,7 @@ import java.io.Serializable;
  */
 @AllArgsConstructor
 @Getter
-public class ResponseItemDto implements Serializable {
+public class ItemShortResponseDto implements Serializable {
     private final Long id;
     private final String name;
-    private final String description;
-    private final Boolean available;
 }
