@@ -24,10 +24,5 @@ public interface ItemMapper {
 
     ResponseItemDto itemToResponseItemDto(Item item);
 
-    Item itemWithBookingsDtoToItem(ItemWithBookingsDto itemWithBookingsDto);
-
     ItemWithBookingsDto itemToItemWithBookingsDto(Item item);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Item updateItemFromItemWithBookingsDto(ItemWithBookingsDto itemWithBookingsDto, @MappingTarget Item item);
 }

@@ -14,10 +14,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.practicum.shareit.booking.exceptions.BookingApprovalException;
 import ru.practicum.shareit.booking.exceptions.NotAvailableException;
-import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
+import ru.practicum.shareit.item.exceptions.CommentException;
 import ru.practicum.shareit.item.exceptions.WrongUserException;
 import ru.practicum.shareit.user.exceptions.DuplicateEmailException;
-import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,39 +26,27 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler
-    public ResponseEntity<String> handleDuplicateEmailException(final DuplicateEmailException e) {
+    public ResponseEntity<ErrorResponse> handleDuplicateEmailException(final DuplicateEmailException e) {
         log.warn(e.getMessage());
-        return ResponseEntity.status(409).body(e.getMessage());
+        return ResponseEntity.status(409).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleNotFoundException(final NotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleNotFoundException(final NotFoundException e) {
         log.warn(e.getMessage());
-        return ResponseEntity.status(404).body(e.getMessage());
+        return ResponseEntity.status(404).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleUserNotFoundException(final UserNotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleNotAvailableException(final NotAvailableException e) {
         log.warn(e.getMessage());
-        return ResponseEntity.status(404).body(e.getMessage());
+        return ResponseEntity.status(400).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleNotAvailableException(final NotAvailableException e) {
+    public ResponseEntity<ErrorResponse> handleWrongUserException(final WrongUserException e) {
         log.warn(e.getMessage());
-        return ResponseEntity.status(400).body(e.getMessage());
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<String> handleItemNotFoundException(final ItemNotFoundException e) {
-        log.warn(e.getMessage());
-        return ResponseEntity.status(404).body(e.getMessage());
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<String> handleWrongUserException(final WrongUserException e) {
-        log.warn(e.getMessage());
-        return ResponseEntity.status(404).body(e.getMessage());
+        return ResponseEntity.status(404).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler
@@ -69,17 +56,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleThrowable(final Throwable e) {
+    public ResponseEntity<ErrorResponse> handleThrowable(final Throwable e) {
         log.error(ExceptionUtils.getStackTrace(e));
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Unexpected error: " + e.getMessage());
+                .body(new ErrorResponse("Unexpected error: " + e.getMessage()));
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleMissingRequestHeaderException(final MissingRequestHeaderException e) {
+    public ResponseEntity<ErrorResponse> handleMissingRequestHeaderException(final MissingRequestHeaderException e) {
         log.warn(e.getMessage());
-        return ResponseEntity.status(400).body(e.getMessage());
+        return ResponseEntity.status(400).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler
@@ -100,19 +87,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(400).body(new ErrorResponse(error));
     }
 
-    @ExceptionHandler(value = {DataIntegrityViolationException.class})
-    public ResponseEntity<String> handleConstraintViolationException(DataIntegrityViolationException e) {
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleCommentException(final CommentException e) {
         log.warn(e.getMessage());
-        return ResponseEntity.status(409).body(e.getMessage());
+        return ResponseEntity.status(400).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(value = {DataIntegrityViolationException.class})
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(DataIntegrityViolationException e) {
+        log.warn(e.getMessage());
+        return ResponseEntity.status(409).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         List<String> errorList = e.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.toList());
         String errors = errorList.toString().substring(1, errorList.toString().length() - 1);
         log.warn(errors);
-        return ResponseEntity.status(400).body(errors);
+        return ResponseEntity.status(400).body(new ErrorResponse(errors));
     }
 }

@@ -21,11 +21,4 @@ public interface UserMapper {
     User updateUserFromUpdateUserDto(UpdateUserDto updateUserDto, @MappingTarget User user);
 
     ResponseUserDto userToResponseUserDto(User user);
-
-    User userIdDtoToUser(UserIdDto userIdDto);
-
-    UserIdDto userToUserIdDto(User user);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    User updateUserFromUserIdDto(UserIdDto userIdDto, @MappingTarget User user);
 }

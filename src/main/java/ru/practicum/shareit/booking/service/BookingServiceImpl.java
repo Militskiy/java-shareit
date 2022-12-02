@@ -16,11 +16,9 @@ import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dao.ItemRepository;
-import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.exceptions.WrongUserException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserRepository;
-import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
@@ -156,12 +154,12 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponseDto createBooking(BookingCreateDto bookingCreateDto, Long bookerId) {
         Item item = itemRepository
                 .findById(bookingCreateDto.getItemId())
-                .orElseThrow(() -> new ItemNotFoundException("No such item with ID: " + bookingCreateDto.getItemId()));
+                .orElseThrow(() -> new NotFoundException("No such item with ID: " + bookingCreateDto.getItemId()));
         if (!item.getOwner().getId().equals(bookerId)) {
             if (item.getAvailable()) {
                 User booker = userRepository
                         .findById(bookerId)
-                        .orElseThrow(() -> new UserNotFoundException("No user with ID: " + bookerId));
+                        .orElseThrow(() -> new NotFoundException("No user with ID: " + bookerId));
                 Booking newBooking = mapper.bookingCreateDtoToBooking(bookingCreateDto);
                 newBooking.setBooker(booker);
                 newBooking.setItem(item);

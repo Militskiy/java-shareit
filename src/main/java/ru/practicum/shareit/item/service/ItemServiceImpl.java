@@ -7,7 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
+import ru.practicum.shareit.booking.model.Status;
+import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.item.dao.CommentRepository;
 import ru.practicum.shareit.item.dao.ItemRepository;
+import ru.practicum.shareit.item.dto.CommentCreateDto;
+import ru.practicum.shareit.item.dto.CommentMapper;
+import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemListDto;
 import ru.practicum.shareit.item.dto.ItemListWithBookingsDto;
@@ -15,14 +21,17 @@ import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import ru.practicum.shareit.item.dto.ResponseItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
-import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
+import ru.practicum.shareit.item.exceptions.CommentException;
 import ru.practicum.shareit.item.exceptions.WrongUserException;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserRepository;
-import ru.practicum.shareit.user.exceptions.UserNotFoundException;
+import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,13 +41,18 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
     private final ItemMapper itemMapper;
     private final BookingMapper bookingMapper;
+    private final CommentMapper commentMapper;
 
 
     @Override
     public ItemWithBookingsDto findItem(Long id, Long userId) {
         Item item = getItem(id);
+        ItemWithBookingsDto itemDto = itemMapper.itemToItemWithBookingsDto(item);
+        List<CommentResponseDto> comments = commentMapper.map(commentRepository.findCommentsByItem_Id(id));
+        itemDto.setComments(Set.copyOf(comments));
         if (item.getOwner().getId().equals(userId)) {
             BookingShortDto lastBooking = bookingMapper.bookingToBookingShortDto(
                     bookingRepository.findFirstByItem_IdAndEndIsBeforeOrderByEndDesc(
@@ -50,13 +64,10 @@ public class ItemServiceImpl implements ItemService {
                             id, LocalDateTime.now()
                     )
             );
-            ItemWithBookingsDto itemDto = itemMapper.itemToItemWithBookingsDto(item);
             itemDto.setLastBooking(lastBooking);
             itemDto.setNextBooking(nextBooking);
-            return itemDto;
-        } else {
-            return itemMapper.itemToItemWithBookingsDto(item);
         }
+        return itemDto;
     }
 
     @Override
@@ -74,7 +85,8 @@ public class ItemServiceImpl implements ItemService {
                                                         .findFirstByItem_IdAndEndIsBeforeOrderByEndDesc(
                                                                 item.getId(), LocalDateTime.now()
                                                         )
-                                                ));
+                                                )
+                                        );
                                         item.setNextBooking(
                                                 bookingMapper.bookingToBookingShortDto(bookingRepository
                                                         .findFirstByItem_IdAndStartIsAfterOrderByStartAsc(
@@ -82,12 +94,16 @@ public class ItemServiceImpl implements ItemService {
                                                         )
                                                 )
                                         );
+                                        item.setComments(Set.copyOf(commentMapper.map(
+                                                        commentRepository.findCommentsByItem_Id(item.getId())
+                                                )
+                                        ));
                                     })
                                     .collect(Collectors.toList())
                     )
                     .build();
         } else {
-            throw new UserNotFoundException("No user with ID: " + ownerId);
+            throw new NotFoundException("No user with ID: " + ownerId);
         }
     }
 
@@ -97,7 +113,7 @@ public class ItemServiceImpl implements ItemService {
         Item newItem = itemMapper.itemDtoToItem(itemDto);
         newItem.setOwner(userRepository
                 .findById(ownerId)
-                .orElseThrow(() -> new UserNotFoundException("No user with ID: " + ownerId)));
+                .orElseThrow(() -> new NotFoundException("No user with ID: " + ownerId)));
         return itemMapper.itemToResponseItemDto(itemRepository.save(newItem));
     }
 
@@ -133,8 +149,25 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
+    @Override
+    @Transactional
+    public CommentResponseDto commentItem(Long userId, Long itemId, CommentCreateDto commentDto) {
+        if (bookingRepository.existsBookingByItem_IdAndBooker_IdAndStatusAndEndIsBefore(
+                itemId, userId, Status.APPROVED, LocalDateTime.now()
+        )) {
+            Item item = getItem(itemId);
+            User user = userRepository.getReferenceById(userId);
+            Comment comment = commentMapper.commentCreateDtoToComment(commentDto);
+            comment.setItem(item);
+            comment.setAuthor(user);
+            return commentMapper.commentToCommentResponseDto(commentRepository.save(comment));
+        } else {
+            throw new CommentException("Cannot comment this item");
+        }
+    }
+
     private Item getItem(Long id) {
         return itemRepository.findById(id)
-                .orElseThrow(() -> new ItemNotFoundException("No item with ID: " + id));
+                .orElseThrow(() -> new NotFoundException("No item with ID: " + id));
     }
 }

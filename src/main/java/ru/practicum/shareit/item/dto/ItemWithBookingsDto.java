@@ -6,6 +6,7 @@ import lombok.Setter;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * A DTO for the {@link ru.practicum.shareit.item.model.Item} entity
@@ -20,4 +21,5 @@ public class ItemWithBookingsDto implements Serializable {
     private final Boolean available;
     private BookingShortDto lastBooking;
     private BookingShortDto nextBooking;
+    private Set<CommentResponseDto> comments;
 }

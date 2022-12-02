@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.ResponseUserDto;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
@@ -11,7 +12,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserListDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.exceptions.DuplicateEmailException;
-import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 
 @Service
@@ -37,11 +37,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ResponseUserDto createUser(UserDto userDto) {
-//        if (!userRepository.existsByEmail(userDto.getEmail())) {
-//            return userMapper.userToResponseUserDto(userRepository.save(userMapper.userDtoToUser(userDto)));
-//        } else {
-//            throw new DuplicateEmailException("Email: " + userDto.getEmail() + " already exists");
-//        }
         return userMapper.userToResponseUserDto(userRepository.save(userMapper.userDtoToUser(userDto)));
 
     }
@@ -66,6 +61,6 @@ public class UserServiceImpl implements UserService {
     }
 
     private User getUser(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("No user with ID: " + id));
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("No user with ID: " + id));
     }
 }

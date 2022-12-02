@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.item.dto.CommentCreateDto;
+import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemListDto;
 import ru.practicum.shareit.item.dto.ItemListWithBookingsDto;
@@ -35,13 +37,13 @@ import javax.validation.constraints.Min;
 @RequiredArgsConstructor
 @Tag(name = "Item services")
 public class ItemController {
-    private static final String HEADER_OWNER_ID = "X-Sharer-User-Id";
+    private static final String HEADER_USER_ID = "X-Sharer-User-Id";
     private final ItemService itemService;
 
     @GetMapping
     @Operation(summary = "Get a list of all items that belong to specific user")
     public ResponseEntity<ItemListWithBookingsDto> findAllItems(
-            @RequestHeader(HEADER_OWNER_ID) @Min(1) Long userId,
+            @RequestHeader(HEADER_USER_ID) @Min(1) Long userId,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize
     ) {
@@ -52,7 +54,7 @@ public class ItemController {
     @GetMapping("/{id}")
     @Operation(summary = "Get an item")
     public ResponseEntity<ItemWithBookingsDto> findItem(
-            @RequestHeader(HEADER_OWNER_ID) @Min(1) Long userId,
+            @RequestHeader(HEADER_USER_ID) @Min(1) Long userId,
             @PathVariable @Min(1) Long id
     ) {
         log.info("Getting item with ID: " + id);
@@ -73,7 +75,7 @@ public class ItemController {
     @PostMapping
     @Operation(summary = "Add a new item")
     public ResponseEntity<ResponseItemDto> createItem(
-            @RequestHeader(HEADER_OWNER_ID) @Min(1) Long userId,
+            @RequestHeader(HEADER_USER_ID) @Min(1) Long userId,
             @RequestBody @Valid ItemDto itemDto
     ) {
         log.info("Creating item: " + itemDto + " for user with ID: " + userId);
@@ -85,7 +87,7 @@ public class ItemController {
     @PatchMapping("/{id}")
     @Operation(summary = "Update an item")
     public ResponseEntity<ResponseItemDto> updateItem(
-            @RequestHeader(HEADER_OWNER_ID) @Min(1) Long ownerId,
+            @RequestHeader(HEADER_USER_ID) @Min(1) Long ownerId,
             @PathVariable @Min(1) Long id,
             @RequestBody @Valid UpdateItemDto updateItemDto
     ) {
@@ -96,10 +98,21 @@ public class ItemController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete an item")
     public void deleteItem(
-            @RequestHeader(HEADER_OWNER_ID) @Min(1) Long userId,
+            @RequestHeader(HEADER_USER_ID) @Min(1) Long userId,
             @PathVariable @Min(1) Long id
     ) {
         log.info("Deleting item with ID: " + id + " that belongs to user with ID: " + userId);
         itemService.deleteItem(id);
+    }
+
+    @PostMapping("/{id}/comment")
+    @Operation(summary = "Leave an item comment")
+    public ResponseEntity<CommentResponseDto> commentItem(
+            @RequestHeader(HEADER_USER_ID) @Min(1) Long userId,
+            @PathVariable @Min(1) Long id,
+            @RequestBody @Valid CommentCreateDto comment
+    ) {
+        log.info("User with ID: {} is commenting on item with ID: {}", userId, id);
+        return ResponseEntity.ok(itemService.commentItem(userId, id, comment));
     }
 }

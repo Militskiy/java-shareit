@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
 import org.springframework.data.domain.PageRequest;
+import ru.practicum.shareit.item.dto.CommentCreateDto;
+import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemListDto;
 import ru.practicum.shareit.item.dto.ItemListWithBookingsDto;
@@ -20,4 +22,6 @@ public interface ItemService {
     void deleteItem(Long id);
 
     ItemListDto searchItems(String text, PageRequest pageRequest);
+
+    CommentResponseDto commentItem(Long userId, Long itemId, CommentCreateDto comment);
 }
