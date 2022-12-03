@@ -1,59 +1,59 @@
-package ru.practicum.shareit.booking.model;
+package ru.practicum.shareit.item.model;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
-import ru.practicum.shareit.item.model.Item;
+import org.hibernate.annotations.CreationTimestamp;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-@Builder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "bookings")
-public class Booking {
+@Entity
+@Table(name = "comments")
+public class Comment {
     @Id
-    @Column(name = "booking_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comment_id", nullable = false)
     private Long id;
-    @Column(name = "start_time")
-    private LocalDateTime start;
-    @Column(name = "end_time")
-    private LocalDateTime end;
+
+    @NotNull
+    private String text;
     @ManyToOne
     @JoinColumn(name = "item_id")
+    @NotNull
     private Item item;
+
     @ManyToOne
-    @JoinColumn(name = "booker_id")
-    private User booker;
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    @JoinColumn(name = "author_id")
+    private User author;
+
+    @CreationTimestamp
+    private LocalDateTime created;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Booking booking = (Booking) o;
-        return id != null && Objects.equals(id, booking.getId());
+        Comment comment = (Comment) o;
+        return id != null && Objects.equals(id, comment.getId());
     }
 
     @Override

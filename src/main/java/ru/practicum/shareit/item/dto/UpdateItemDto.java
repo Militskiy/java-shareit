@@ -6,7 +6,6 @@ import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -18,18 +17,15 @@ import java.io.Serializable;
 @Value
 @Builder
 @Jacksonized
-public class ItemDto implements Serializable {
-    @NotNull
+public class UpdateItemDto implements Serializable {
     @Pattern(regexp = "^[^ ].*[^ .]$", message = "Name is not valid")
     @Size(min = 1, max = 20)
     @Schema(example = "Item")
     String name;
-    @NotNull
     @Pattern(regexp = "^[^ ].*[^ .]$", message = "Description is not valid")
     @Size(min = 1, max = 200)
     @Schema(example = "Test item")
     String description;
-    @NotNull
     @Schema(example = "true")
     Boolean available;
 }

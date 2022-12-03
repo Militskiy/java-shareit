@@ -1,18 +1,24 @@
 package ru.practicum.shareit.user.dto;
 
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.ReportingPolicy;
+import org.springframework.data.domain.Page;
 import ru.practicum.shareit.user.model.User;
 
-@Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public interface UserMapper {
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+import java.util.List;
 
-    UserDto userToUserDto(User user);
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
+public interface UserMapper {
 
     User userDtoToUser(UserDto userDto);
 
-    void updateUserFromDto(UserDto userDto, @MappingTarget User user);
+    List<ResponseUserDto> map(Page<User> users);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    User updateUserFromUpdateUserDto(UpdateUserDto updateUserDto, @MappingTarget User user);
+
+    ResponseUserDto userToResponseUserDto(User user);
 }

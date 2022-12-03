@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,12 +18,19 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.item.dto.CommentCreateDto;
+import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemListDto;
+import ru.practicum.shareit.item.dto.ItemListWithBookingsDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
+import ru.practicum.shareit.item.dto.ResponseItemDto;
+import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+
 
 @RestController
 @RequestMapping("/items")
@@ -29,36 +38,49 @@ import javax.validation.constraints.Min;
 @RequiredArgsConstructor
 @Tag(name = "Item services")
 public class ItemController {
+    private static final String HEADER_USER_ID = "X-Sharer-User-Id";
     private final ItemService itemService;
 
     @GetMapping
     @Operation(summary = "Get a list of all items that belong to specific user")
-    public ResponseEntity<ItemListDto> findAllItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<ItemListWithBookingsDto> findAllItems(
+            @RequestHeader(HEADER_USER_ID) @Min(1) Long userId,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
         log.info("Getting a list of all items that belong to user with ID: " + userId);
-        return ResponseEntity.ok(itemService.findAllItems(userId));
+        return ResponseEntity.ok(itemService.findAllItems(
+                userId, PageRequest.of(from, size, Sort.by("id").ascending())
+        ));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get an item")
-    public ResponseEntity<ItemDto> findItem(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+    public ResponseEntity<ItemWithBookingsDto> findItem(
+            @RequestHeader(HEADER_USER_ID) @Min(1) Long userId,
             @PathVariable @Min(1) Long id
     ) {
-        log.info("Getting item with ID: " + id + " that belongs to user " + userId);
-        return ResponseEntity.ok(itemService.findItem(id));
+        log.info("Getting item with ID: " + id);
+        return ResponseEntity.ok(itemService.findItem(id, userId));
     }
 
     @GetMapping("/search")
     @Operation(summary = "Search for items")
-    public ResponseEntity<ItemListDto> searchForItems(@RequestParam String text) {
+    public ResponseEntity<ItemListDto> searchForItems(
+            @RequestParam String text,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
         log.info("Searching for items, keyword: " + text);
-        return ResponseEntity.ok(itemService.searchItems(text.toUpperCase()));
+        return ResponseEntity.ok(itemService.searchItems(
+                text.toUpperCase(), PageRequest.of(from, size, Sort.by("id").ascending())
+        ));
     }
 
     @PostMapping
     @Operation(summary = "Add a new item")
-    public ResponseEntity<ItemDto> createItem(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+    public ResponseEntity<ResponseItemDto> createItem(
+            @RequestHeader(HEADER_USER_ID) @Min(1) Long userId,
             @RequestBody @Valid ItemDto itemDto
     ) {
         log.info("Creating item: " + itemDto + " for user with ID: " + userId);
@@ -69,22 +91,33 @@ public class ItemController {
 
     @PatchMapping("/{id}")
     @Operation(summary = "Update an item")
-    public ResponseEntity<ItemDto> updateItem(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long ownerId,
+    public ResponseEntity<ResponseItemDto> updateItem(
+            @RequestHeader(HEADER_USER_ID) @Min(1) Long ownerId,
             @PathVariable @Min(1) Long id,
-            @RequestBody ItemDto itemDto
+            @RequestBody @Valid UpdateItemDto updateItemDto
     ) {
         log.info("Updating item with ID: " + id + " that belongs to user with ID: " + ownerId);
-        return ResponseEntity.ok().body((itemService.updateItem(itemDto, id, ownerId)));
+        return ResponseEntity.ok().body((itemService.updateItem(updateItemDto, id, ownerId)));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete an item")
     public void deleteItem(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+            @RequestHeader(HEADER_USER_ID) @Min(1) Long userId,
             @PathVariable @Min(1) Long id
     ) {
         log.info("Deleting item with ID: " + id + " that belongs to user with ID: " + userId);
         itemService.deleteItem(id);
+    }
+
+    @PostMapping("/{id}/comment")
+    @Operation(summary = "Leave an item comment")
+    public ResponseEntity<CommentResponseDto> commentItem(
+            @RequestHeader(HEADER_USER_ID) @Min(1) Long userId,
+            @PathVariable @Min(1) Long id,
+            @RequestBody @Valid CommentCreateDto comment
+    ) {
+        log.info("User with ID: {} is commenting on item with ID: {}", userId, id);
+        return ResponseEntity.ok(itemService.commentItem(userId, id, comment));
     }
 }

@@ -1,87 +1,64 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.dao.UserDao;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.user.dao.UserRepository;
+import ru.practicum.shareit.user.dto.ResponseUserDto;
+import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserDtoList;
+import ru.practicum.shareit.user.dto.UserListDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.exceptions.DuplicateEmailException;
-import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
-
-    private final UserDao userRepository;
-    private final Validator validator;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Override
-    public UserDto findUser(Long id) {
-        return UserMapper.INSTANCE.userToUserDto(getUser(id));
+    @Transactional(readOnly = true)
+    public ResponseUserDto findUser(Long id) {
+        return userMapper.userToResponseUserDto(getUser(id));
     }
 
     @Override
-    public UserDtoList findAllUsers() {
-        return UserDtoList.builder()
-                .userDtoList(
-                        getUsers()
-                                .stream()
-                                .map(UserMapper.INSTANCE::userToUserDto)
-                                .collect(Collectors.toList())
-                )
+    @Transactional(readOnly = true)
+    public UserListDto findAllUsers(PageRequest pageRequest) {
+        return UserListDto
+                .builder()
+                .userDtoList(userMapper.map(userRepository.findAll(pageRequest)))
                 .build();
     }
 
     @Override
-    public UserDto createUser(UserDto userDto) {
-        User newUser = UserMapper.INSTANCE.userDtoToUser(userDto);
-        if (getUsers().stream().noneMatch(user -> user.getEmail().equals(newUser.getEmail()))) {
-            return UserMapper.INSTANCE.userToUserDto(userRepository.createUser(newUser));
-        } else {
-            throw new DuplicateEmailException("Email: " + newUser.getEmail() + " already exists");
-        }
+    public ResponseUserDto createUser(UserDto userDto) {
+        return userMapper.userToResponseUserDto(userRepository.save(userMapper.userDtoToUser(userDto)));
     }
 
     @Override
-    public UserDto updateUser(UserDto partialUserDto, Long userId) {
-        User targetUser = getUser(userId);
-        User updatedUser = targetUser.toBuilder().build();
-        UserMapper.INSTANCE.updateUserFromDto(partialUserDto, updatedUser);
-        Set<ConstraintViolation<User>> violations = validator.validate(updatedUser);
-        if (violations.isEmpty()) {
-            if (getUsers()
-                    .stream()
-                    .filter(user -> !user.getId().equals(updatedUser.getId()))
-                    .noneMatch(user -> user.getEmail().equals(updatedUser.getEmail()))) {
-                return UserMapper.INSTANCE.userToUserDto(userRepository.updateUser(updatedUser));
-            } else {
-                throw new DuplicateEmailException("Email: " + updatedUser.getEmail() + " already exists");
-            }
+    public ResponseUserDto updateUser(UpdateUserDto updateUserDto, Long userId) {
+        if (userRepository.findByEmailAndIdIsNot(updateUserDto.getEmail(), userId).isEmpty()) {
+            User targetUser = getUser(userId);
+            return userMapper.userToResponseUserDto(
+                    userRepository.save(userMapper.updateUserFromUpdateUserDto(updateUserDto, targetUser))
+            );
         } else {
-            throw new ConstraintViolationException(violations);
+            throw new DuplicateEmailException("Email: " + updateUserDto.getEmail() + " already exists");
         }
     }
 
     @Override
     public void deleteUser(Long id) {
-        findUser(id);
-        userRepository.deleteUser(id);
+        userRepository.deleteById(id);
     }
 
     private User getUser(Long id) {
-        return userRepository.findUser(id).orElseThrow(() -> new UserNotFoundException("No user with ID: " + id));
-    }
-
-    private List<User> getUsers() {
-        return userRepository.findAllUsers();
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("No user with ID: " + id));
     }
 }

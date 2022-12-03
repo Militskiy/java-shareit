@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.dto;
+package ru.practicum.shareit.item.dto;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Builder;
@@ -10,7 +10,7 @@ import java.util.List;
 @Value
 @Builder
 @Jacksonized
-public class UserDtoList {
+public class ItemListWithBookingsDto {
     @JsonValue
-    List<UserDto> userDtoList;
+    List<ItemWithBookingsDto> items;
 }

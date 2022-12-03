@@ -7,7 +7,6 @@ import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
@@ -18,12 +17,11 @@ import java.io.Serializable;
 @Value
 @Builder
 @Jacksonized
-public class UserDto implements Serializable {
-    @NotNull(message = "name must not be null")
-    @Pattern(regexp = "^[^ ].*[^ .]$", message = "name is not valid")
+public class UpdateUserDto implements Serializable {
+
     @Schema(example = "User")
+    @Pattern(regexp = "^[^ ].*[^ .]$", message = "Name is not valid")
     String name;
-    @NotNull(message = "email must not be null")
     @Email
     @Schema(example = "user@test.com")
     String email;
