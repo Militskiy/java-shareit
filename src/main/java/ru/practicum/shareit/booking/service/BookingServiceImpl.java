@@ -142,7 +142,7 @@ public class BookingServiceImpl implements BookingService {
                             ))
                             .build();
                 default:
-                    throw new IllegalArgumentException("Unknown state: UNSUPPORTED_STATUS");
+                    throw new IllegalArgumentException("Unknown state");
             }
         } else {
             throw new NotFoundException("No user with ID: " + ownerId);
