@@ -16,17 +16,19 @@ import ru.practicum.shareit.user.model.User;
 
 @Service
 @AllArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseUserDto findUser(Long id) {
         return userMapper.userToResponseUserDto(getUser(id));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserListDto findAllUsers(PageRequest pageRequest) {
         return UserListDto
                 .builder()
@@ -35,14 +37,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public ResponseUserDto createUser(UserDto userDto) {
         return userMapper.userToResponseUserDto(userRepository.save(userMapper.userDtoToUser(userDto)));
-
     }
 
     @Override
-    @Transactional
     public ResponseUserDto updateUser(UpdateUserDto updateUserDto, Long userId) {
         if (userRepository.findByEmailAndIdIsNot(updateUserDto.getEmail(), userId).isEmpty()) {
             User targetUser = getUser(userId);
@@ -55,7 +54,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }

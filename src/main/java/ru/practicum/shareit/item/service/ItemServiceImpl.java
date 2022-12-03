@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
@@ -48,6 +48,7 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public ItemWithBookingsDto findItem(Long id, Long userId) {
         Item item = getItem(id);
         ItemWithBookingsDto itemDto = itemMapper.itemToItemWithBookingsDto(item);
@@ -71,6 +72,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemListWithBookingsDto findAllItems(Long ownerId, PageRequest pageRequest) {
         if (userRepository.existsById(ownerId)) {
             return ItemListWithBookingsDto.builder()
@@ -108,7 +110,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional
     public ResponseItemDto createItem(ItemDto itemDto, Long ownerId) {
         Item newItem = itemMapper.itemDtoToItem(itemDto);
         newItem.setOwner(userRepository
@@ -118,7 +119,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional
     public ResponseItemDto updateItem(UpdateItemDto updateItemDto, Long itemId, Long ownerId) {
         Item targetItem = getItem(itemId);
         if (targetItem.getOwner().getId().equals(ownerId)) {
@@ -131,12 +131,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional
     public void deleteItem(Long id) {
         itemRepository.deleteById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemListDto searchItems(String text, PageRequest pageRequest) {
         if (!text.isBlank()) {
             return ItemListDto.builder()
@@ -150,7 +150,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional
     public CommentResponseDto commentItem(Long userId, Long itemId, CommentCreateDto commentDto) {
         if (bookingRepository.existsBookingByItem_IdAndBooker_IdAndStatusAndEndIsBefore(
                 itemId, userId, Status.APPROVED, LocalDateTime.now()
