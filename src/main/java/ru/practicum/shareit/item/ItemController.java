@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,11 +45,13 @@ public class ItemController {
     @Operation(summary = "Get a list of all items that belong to specific user")
     public ResponseEntity<ItemListWithBookingsDto> findAllItems(
             @RequestHeader(HEADER_USER_ID) @Min(1) Long userId,
-            @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size
     ) {
         log.info("Getting a list of all items that belong to user with ID: " + userId);
-        return ResponseEntity.ok(itemService.findAllItems(userId, PageRequest.of(pageNo, pageSize)));
+        return ResponseEntity.ok(itemService.findAllItems(
+                userId, PageRequest.of(from, size, Sort.by("id").ascending())
+        ));
     }
 
     @GetMapping("/{id}")
@@ -65,11 +68,13 @@ public class ItemController {
     @Operation(summary = "Search for items")
     public ResponseEntity<ItemListDto> searchForItems(
             @RequestParam String text,
-            @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size
     ) {
         log.info("Searching for items, keyword: " + text);
-        return ResponseEntity.ok(itemService.searchItems(text.toUpperCase(), PageRequest.of(pageNo, pageSize)));
+        return ResponseEntity.ok(itemService.searchItems(
+                text.toUpperCase(), PageRequest.of(from, size, Sort.by("id").ascending())
+        ));
     }
 
     @PostMapping

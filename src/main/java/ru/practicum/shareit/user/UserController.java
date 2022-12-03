@@ -37,11 +37,11 @@ public class UserController {
     @GetMapping
     @Operation(summary = "Get a list of all users")
     public ResponseEntity<UserListDto> findAllUsers(
-            @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size
     ) {
         log.info("Getting a list of all users");
-        return ResponseEntity.ok(userService.findAllUsers(PageRequest.of(pageNo, pageSize)));
+        return ResponseEntity.ok(userService.findAllUsers(PageRequest.of(from, size)));
     }
 
     @GetMapping("/{id}")

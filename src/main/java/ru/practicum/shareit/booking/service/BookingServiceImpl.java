@@ -52,13 +52,13 @@ public class BookingServiceImpl implements BookingService {
                 case CURRENT:
                     return BookingListDto.builder().bookings(mapper.map(
                             bookingRepository.findBookingsByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
-                                    bookerId, LocalDateTime.now(), LocalDateTime.now(), pageRequest
+                                    bookerId, now(), now(), pageRequest
                             ))).build();
                 case PAST:
                     return BookingListDto.builder()
                             .bookings(mapper.map(
                                     bookingRepository.findBookingsByBookerIdAndEndIsBeforeOrderByStartDesc(
-                                            bookerId, LocalDateTime.now(), pageRequest
+                                            bookerId, now(), pageRequest
                                     )
                             ))
                             .build();
@@ -66,7 +66,7 @@ public class BookingServiceImpl implements BookingService {
                     return BookingListDto.builder()
                             .bookings(mapper.map(
                                     bookingRepository.findBookingsByBookerIdAndStartIsAfterOrderByStartDesc(
-                                            bookerId, LocalDateTime.now(), pageRequest
+                                            bookerId, now(), pageRequest
                                     )
                             ))
                             .build();
@@ -107,13 +107,13 @@ public class BookingServiceImpl implements BookingService {
                 case CURRENT:
                     return BookingListDto.builder().bookings(mapper.map(
                             bookingRepository.findBookingsByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
-                                    ownerId, LocalDateTime.now(), LocalDateTime.now(), pageRequest
+                                    ownerId, now(), now(), pageRequest
                             ))).build();
                 case PAST:
                     return BookingListDto.builder()
                             .bookings(mapper.map(
                                     bookingRepository.findBookingsByItemOwnerIdAndEndIsBeforeOrderByStartDesc(
-                                            ownerId, LocalDateTime.now(), pageRequest
+                                            ownerId, now(), pageRequest
                                     )
                             ))
                             .build();
@@ -121,7 +121,7 @@ public class BookingServiceImpl implements BookingService {
                     return BookingListDto.builder()
                             .bookings(mapper.map(
                                     bookingRepository.findBookingsByItemOwnerIdAndStartIsAfterOrderByStartDesc(
-                                            ownerId, LocalDateTime.now(), pageRequest
+                                            ownerId, now(), pageRequest
                                     )
                             ))
                             .build();
@@ -192,5 +192,9 @@ public class BookingServiceImpl implements BookingService {
         } else {
             throw new WrongUserException("Can only approve own bookings");
         }
+    }
+
+    private LocalDateTime now() {
+        return LocalDateTime.now();
     }
 }
