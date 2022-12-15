@@ -37,8 +37,7 @@ public class Comment {
     @NotNull
     private String text;
     @ManyToOne
-    @JoinColumn(name = "item_id")
-    @NotNull
+    @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
     @ManyToOne

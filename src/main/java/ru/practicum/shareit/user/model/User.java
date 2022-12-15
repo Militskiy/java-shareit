@@ -7,15 +7,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.model.Item;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -36,6 +40,12 @@ public class User {
     @NotNull
     @Column(unique = true)
     private String email;
+
+    @OneToMany(mappedBy = "owner")
+    private Set<Item> items;
+
+    @OneToMany(mappedBy = "booker")
+    private Set<Booking> bookings;
 
     @Override
     public boolean equals(Object o) {

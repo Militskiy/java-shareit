@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ru.practicum.shareit.booking.annotations.EndAfterStart;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 /**
  * A DTO for the {@link ru.practicum.shareit.booking.model.Booking} entity
  */
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor = @__(@JsonCreator))
 @Getter
 @Valid
 @EndAfterStart

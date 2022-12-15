@@ -32,4 +32,5 @@ public class ItemDto implements Serializable {
     @NotNull
     @Schema(example = "true")
     Boolean available;
+    Long requestId;
 }

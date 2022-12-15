@@ -50,12 +50,12 @@ public class BookingController {
     public ResponseEntity<BookingListDto> findBookingsByBooker(
             @RequestHeader(HEADER_USER_ID) @Min(1) Long bookerId,
             @RequestParam(defaultValue = "ALL") State state,
-            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "1") Integer from,
             @RequestParam(defaultValue = "10") Integer size
     ) {
         log.info("Getting {} bookings of user with ID: {}", state, bookerId);
         return ResponseEntity.ok(
-                bookingService.findBookingsByBookerAndState(bookerId, state, PageRequest.of(from, size))
+                bookingService.findBookingsByBookerAndState(bookerId, state, PageRequest.of(from - 1, size))
         );
     }
 
