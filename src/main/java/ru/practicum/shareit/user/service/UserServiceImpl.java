@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public ResponseUserDto findUser(Long id) {
-        return userMapper.userToResponseUserDto(getUser(id));
+        return userRepository.findUserById(id).orElseThrow(() -> new NotFoundException("No user with ID: " + id));
     }
 
     @Override
@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseUserDto updateUser(UpdateUserDto updateUserDto, Long userId) {
-        if (userRepository.findByEmailAndIdIsNot(updateUserDto.getEmail(), userId).isEmpty()) {
+        if (userRepository.findByEmailIgnoreCaseAndIdIsNot(updateUserDto.getEmail(), userId).isEmpty()) {
             User targetUser = getUser(userId);
             return userMapper.userToResponseUserDto(
                     userRepository.save(userMapper.updateUserFromUpdateUserDto(updateUserDto, targetUser))

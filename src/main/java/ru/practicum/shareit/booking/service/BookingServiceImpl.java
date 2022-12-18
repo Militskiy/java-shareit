@@ -35,7 +35,8 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponseDto findBooking(Long id, Long userId) {
         return mapper.bookingToBookingResponseDto(
-                bookingRepository.findBooking(id, userId).orElseThrow(() -> new NotFoundException("Booking not found"))
+                bookingRepository.findBookingByIdAndBooker_IdOrIdAndItem_Owner_Id(id, userId, id, userId)
+                        .orElseThrow(() -> new NotFoundException("Booking not found"))
         );
     }
 

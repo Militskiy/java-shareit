@@ -18,6 +18,7 @@ import ru.practicum.shareit.item.exceptions.CommentException;
 import ru.practicum.shareit.item.exceptions.WrongUserException;
 import ru.practicum.shareit.user.exceptions.DuplicateEmailException;
 
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -102,9 +103,15 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(DataIntegrityViolationException e) {
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationExcepiton(DataIntegrityViolationException e) {
         log.warn(e.getMessage());
         return ResponseEntity.status(409).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
+        log.warn(e.getMessage());
+        return ResponseEntity.status(400).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler
