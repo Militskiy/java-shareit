@@ -28,9 +28,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class UserServiceTest implements Queries {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    UserService userService;
+    private UserService userService;
     private UserDto userCreateDtoOne;
     private UserDto userCreateDtoTwo;
 

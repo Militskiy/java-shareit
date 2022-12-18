@@ -10,11 +10,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.Queries;
+import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentCreateDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
+import ru.practicum.shareit.item.exceptions.CommentException;
+import ru.practicum.shareit.item.exceptions.WrongUserException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase
@@ -56,6 +60,23 @@ class ItemServiceTest implements Queries {
     }
 
     @Test
+    void givenNoItem_whenFindingItem_thenThrowException() {
+        assertThatThrownBy(() -> itemService.findItem(99L, 99L)).isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void givenNoOwner_whenFindingItem_thenThrowException() {
+        assertThatThrownBy(() -> itemService.findAllItems(99L, PageRequest.of(0, 10)))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void givenNoOwner_whenCreatingItem_thenThrowException() {
+        assertThatThrownBy(() -> itemService.createItem(itemOne, 99L))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
     @Sql(statements = {RESET_USERS_ID, ADD_USER})
     void givenTwoSavedItems_whenFindingAllItems_thenAllItemsAreFound() {
         itemService.createItem(itemOne, 1L);
@@ -94,6 +115,22 @@ class ItemServiceTest implements Queries {
                 .isEqualTo(createResult);
         assertThat(updateResult.getAvailable()).isEqualTo(updateItem.getAvailable());
 
+    }
+
+    @Test
+    @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER})
+    void givenValidUpdateDtoButWrongOwner_whenUpdatingItem_thenThrowException() {
+        itemService.createItem(itemOne, 1L);
+        assertThatThrownBy(() -> itemService.updateItem(updateItem, 1L, 99L))
+                .isInstanceOf(WrongUserException.class);
+    }
+
+    @Test
+    @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER})
+    void givenValidUpdateDtoButItemId_whenUpdatingItem_thenThrowException() {
+        itemService.createItem(itemOne, 1L);
+        assertThatThrownBy(() -> itemService.updateItem(updateItem, 99L, 1L))
+                .isInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -148,11 +185,19 @@ class ItemServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER, ADD_USER_2, ADD_ITEM_BOOKING_ITEM1_USER2})
+    @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER, ADD_USER_2, ADD_ITEM, ADD_BOOKING_ITEM1_USER2})
     void givenSavedItemWithPreviousBookingByUser2_whenCommentingItem_thenCommentIsCreated() {
         var result = itemService.commentItem(2L, 1L, CommentCreateDto.builder().text("Comment").build());
         assertThat(result.getText()).isEqualTo("Comment");
         var commentResult = itemService.findItem(1L, 1L);
         assertThat(commentResult.getComments()).contains(result);
+    }
+
+    @Test
+    @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER, ADD_USER_2, ADD_ITEM, ADD_BOOKING_ITEM1_USER2})
+    void givenSavedItemWithPreviousBookingByUser2_whenCommentingItemWithWrongUser_thenThrowException() {
+        assertThatThrownBy(() -> itemService.commentItem(
+                99L, 1L, CommentCreateDto.builder().text("Comment").build()
+        )).isInstanceOf(CommentException.class);
     }
 }

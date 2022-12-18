@@ -1,7 +1,8 @@
 package ru.practicum.shareit.request.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -9,10 +10,11 @@ import java.time.LocalDateTime;
 /**
  * A DTO for the {@link ru.practicum.shareit.request.model.ItemRequest} entity
  */
-@AllArgsConstructor
-@Getter
+@Value
+@Builder
+@Jacksonized
 public class ItemRequestCreateResponseDto implements Serializable {
-    private final Long id;
-    private final String description;
-    private final LocalDateTime created;
+    Long id;
+    String description;
+    LocalDateTime created;
 }

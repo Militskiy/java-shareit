@@ -103,7 +103,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationExcepiton(DataIntegrityViolationException e) {
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         log.warn(e.getMessage());
         return ResponseEntity.status(409).body(new ErrorResponse(e.getMessage()));
     }

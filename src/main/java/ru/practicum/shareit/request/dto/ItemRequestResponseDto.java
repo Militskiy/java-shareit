@@ -1,7 +1,8 @@
 package ru.practicum.shareit.request.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 import ru.practicum.shareit.item.dto.ResponseItemDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 
@@ -12,11 +13,12 @@ import java.util.Set;
 /**
  * A DTO for the {@link ItemRequest} entity
  */
-@AllArgsConstructor
-@Getter
+@Value
+@Builder
+@Jacksonized
 public class ItemRequestResponseDto implements Serializable {
-    private final Long id;
-    private final String description;
-    private final LocalDateTime created;
-    private final Set<ResponseItemDto> items;
+    Long id;
+    String description;
+    LocalDateTime created;
+    Set<ResponseItemDto> items;
 }
