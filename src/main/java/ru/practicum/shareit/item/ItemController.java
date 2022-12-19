@@ -107,12 +107,13 @@ public class ItemController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete an item")
-    public void deleteItem(
+    public ResponseEntity<Void> deleteItem(
             @RequestHeader(HEADER_USER_ID) @Positive Long userId,
             @PathVariable @Positive Long id
     ) {
         log.info("Deleting item with ID: " + id + " that belongs to user with ID: " + userId);
         itemService.deleteItem(id);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/comment")

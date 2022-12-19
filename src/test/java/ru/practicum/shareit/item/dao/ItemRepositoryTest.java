@@ -30,7 +30,7 @@ class ItemRepositoryTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER, ADD_ITEM})
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_ITEM})
     void itemEntityTest() {
         var result = itemRepository.getReferenceById(1L);
         Set<Item> testSet = Set.of(result);

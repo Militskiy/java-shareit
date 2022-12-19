@@ -50,7 +50,7 @@ class ItemServiceTest implements Queries {
 
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenSavedItem_whenFindingItem_thenItemIsFound() {
         var createResult = itemService.createItem(itemOne, 1L);
         var findResult = itemService.findItem(createResult.getId(), 1L);
@@ -77,7 +77,7 @@ class ItemServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenTwoSavedItems_whenFindingAllItems_thenAllItemsAreFound() {
         itemService.createItem(itemOne, 1L);
         itemService.createItem(itemTwo, 1L);
@@ -94,7 +94,7 @@ class ItemServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenValidItemDto_whenCreatingItem_thenItemIsCreated() {
         var result = itemService.createItem(itemOne, 1L);
         assertThat(result)
@@ -105,7 +105,7 @@ class ItemServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenValidUpdateDto_whenUpdatingItem_thenItemIsUpdated() {
         var createResult = itemService.createItem(itemOne, 1L);
         var updateResult = itemService.updateItem(updateItem, 1L, 1L);
@@ -118,7 +118,7 @@ class ItemServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenValidUpdateDtoButWrongOwner_whenUpdatingItem_thenThrowException() {
         itemService.createItem(itemOne, 1L);
         assertThatThrownBy(() -> itemService.updateItem(updateItem, 1L, 99L))
@@ -126,7 +126,7 @@ class ItemServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenValidUpdateDtoButItemId_whenUpdatingItem_thenThrowException() {
         itemService.createItem(itemOne, 1L);
         assertThatThrownBy(() -> itemService.updateItem(updateItem, 99L, 1L))
@@ -134,7 +134,7 @@ class ItemServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenSavedItem_whenDeletingItem_itemIsDeleted() {
         var id = itemService.createItem(itemOne, 1L).getId();
         assertThat(itemService.findAllItems(1L, PageRequest.of(0, 10)).getItems()).hasSize(1);
@@ -143,7 +143,7 @@ class ItemServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenSearchRequest_whenSearching_thenFindResultByNamen() {
         itemService.createItem(itemOne, 1L);
         itemService.createItem(itemTwo, 1L);
@@ -160,7 +160,7 @@ class ItemServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenSearchRequest_whenSearching_thenFindResultByDescription() {
         itemService.createItem(itemOne, 1L);
         itemService.createItem(itemTwo, 1L);
@@ -177,7 +177,7 @@ class ItemServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenEmptySearchRequest_whenSearching_thenFindEmptyResult() {
         itemService.createItem(itemOne, 1L);
         var result = itemService.searchItems("", PageRequest.of(0, 10));
@@ -185,7 +185,7 @@ class ItemServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER, ADD_USER_2, ADD_ITEM, ADD_BOOKING_ITEM1_USER2})
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2, ADD_ITEM, ADD_BOOKING_ITEM1_USER2})
     void givenSavedItemWithPreviousBookingByUser2_whenCommentingItem_thenCommentIsCreated() {
         var result = itemService.commentItem(2L, 1L, CommentCreateDto.builder().text("Comment").build());
         assertThat(result.getText()).isEqualTo("Comment");
@@ -194,7 +194,7 @@ class ItemServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER, ADD_USER_2, ADD_ITEM, ADD_BOOKING_ITEM1_USER2})
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2, ADD_ITEM, ADD_BOOKING_ITEM1_USER2})
     void givenSavedItemWithPreviousBookingByUser2_whenCommentingItemWithWrongUser_thenThrowException() {
         assertThatThrownBy(() -> itemService.commentItem(
                 99L, 1L, CommentCreateDto.builder().text("Comment").build()

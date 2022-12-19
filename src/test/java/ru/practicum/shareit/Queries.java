@@ -25,8 +25,10 @@ public interface Queries {
     String WAITING_BOOKING =
             "insert into bookings (end_time, start_time, status, booker_id, item_id) " +
                     "values ('3010-12-19 00:37:08.000000', '3002-12-19 00:36:51.000000', 'WAITING', 2, 1)";
-    String RESET_USERS_ID = "alter table users alter column user_id restart with 1;";
-    String RESET_ITEMS_ID = "alter table items alter column item_id restart with 1;";
-    String RESET_REQUESTS_ID = "alter table item_requests alter column request_id restart with 1;";
-    String RESET_BOOKINGS_ID = "alter table bookings alter column booking_id restart with 1;";
+
+    String RESET_IDS =
+            "alter table users alter column user_id restart with 1;" +
+                    "alter table items alter column item_id restart with 1;" +
+                    "alter table item_requests alter column request_id restart with 1;" +
+                    "alter table bookings alter column booking_id restart with 1;";
 }

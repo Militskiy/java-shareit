@@ -55,7 +55,7 @@ class BookingRepositoryTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, RESET_BOOKINGS_ID, ADD_USER, ADD_USER_2, ADD_ITEM})
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2, ADD_ITEM})
     void bookingEntityTest() {
         var createResult = bookingRepository.save(booking1);
         Set<Booking> resultSet = Set.of(createResult);

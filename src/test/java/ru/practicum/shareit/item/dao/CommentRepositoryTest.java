@@ -40,7 +40,7 @@ class CommentRepositoryTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER, ADD_ITEM, ADD_USER_2, ADD_BOOKING_ITEM1_USER2, TEST})
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_ITEM, ADD_USER_2, ADD_BOOKING_ITEM1_USER2, TEST})
     void commentEntityTest() {
         var result = commentRepository.getReferenceById(1L);
         Set<Comment> testSet = Set.of(result);

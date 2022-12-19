@@ -42,7 +42,7 @@ class ItemRequestServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, RESET_REQUESTS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenValidItemRequestCreateDto_whenCreatingItemRequest_thenItemRequestIsCreated() {
         var result = itemRequestService.create(itemRequestCreateDto, 1L);
         assertThat(result)
@@ -64,14 +64,14 @@ class ItemRequestServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenNoRequest_whenFindingById_thenThrowException() {
         assertThatThrownBy(() -> itemRequestService.findById(1L, 1L))
                 .isInstanceOf(NotFoundException.class);
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, RESET_REQUESTS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenSavedItemRequest_whenFindingById_thenRequestIsFound() {
         var createResult = itemRequestService.create(itemRequestCreateDto, 1L);
         var findResult = itemRequestService.findById(1L, 1L);
@@ -82,7 +82,7 @@ class ItemRequestServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, RESET_REQUESTS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenSavedItemRequest_whenFindingOwnRequests_thenRequestsAreFound() {
         var createResult = itemRequestService.create(itemRequestCreateDto, 1L);
         var findResult = itemRequestService.findOwnRequests(1L, PageRequest.of(0, 10));
@@ -100,7 +100,7 @@ class ItemRequestServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, RESET_REQUESTS_ID, ADD_USER, ADD_USER_2})
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2})
     void givenSavedItemRequest_whenFindingAll_thenRequestsAreFound() {
         var createResult = itemRequestService.create(itemRequestCreateDto, 1L);
         var findResult = itemRequestService.findAllRequests(2L, PageRequest.of(0, 10));
@@ -112,7 +112,7 @@ class ItemRequestServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, ADD_USER})
+    @Sql(statements = {RESET_IDS, ADD_USER})
     void givenOnlyOwnRequest_whenFindingAll_thenNoRequestsAreFound() {
         var findResult = itemRequestService.findAllRequests(1L, PageRequest.of(0, 10));
         assertThat(findResult.getItemRequests()).hasSize(0);

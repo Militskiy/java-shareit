@@ -45,7 +45,7 @@ class ItemRequestRepositoryTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {RESET_USERS_ID, ADD_USER, ADD_USER_2})
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2})
     void itemRequestEntityTest() {
         itemRequestRepository.save(itemRequest1);
         var result = itemRequestRepository.getReferenceById(1L);

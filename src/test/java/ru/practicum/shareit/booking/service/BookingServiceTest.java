@@ -46,15 +46,7 @@ class BookingServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
-            ADD_USER,
-            ADD_USER_2,
-            ADD_ITEM,
-            PAST_BOOKING
-    })
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2, ADD_ITEM, PAST_BOOKING})
     void givenBookerId_whenFindingBooking_resultIsFound() {
         var result = bookingService.findBooking(1L, 2L);
         assertThat(result.getId()).isEqualTo(1L);
@@ -66,28 +58,14 @@ class BookingServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
-            ADD_USER,
-            ADD_USER_2,
-            ADD_ITEM,
-    })
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2, ADD_ITEM})
     void givenNoBooking_whenFindingBooking_ThrowException() {
         assertThatThrownBy(() -> bookingService.findBooking(1L, 2L))
                 .isInstanceOf(NotFoundException.class);
     }
 
     @Test
-    @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
-            ADD_USER,
-            ADD_USER_2,
-            ADD_ITEM
-    })
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2, ADD_ITEM})
     void givenValidItemCreateDto_whenCreatingItem_getEqualResultBack() {
         var result = bookingService.createBooking(bookingCreateDto, 2L);
         assertThat(result.getId()).isEqualTo(1L);
@@ -99,82 +77,42 @@ class BookingServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
-            ADD_USER,
-            ADD_USER_2,
-            ADD_ITEM
-    })
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2, ADD_ITEM})
     void givenEmptyCreateDto_whenCreatingItem_getEqualResultBack() {
         assertThatThrownBy(() -> bookingService.createBooking(BookingCreateDto.builder().build(), 2L))
                 .isInstanceOf(InvalidDataAccessApiUsageException.class);
     }
 
     @Test
-    @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_BOOKINGS_ID,
-            ADD_USER,
-            ADD_USER_2
-    })
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2})
     void givenNoItem_whenCreatingBooking_thenThrowException() {
         assertThatThrownBy(() -> bookingService.createBooking(bookingCreateDto, 2L))
                 .isInstanceOf(NotFoundException.class);
     }
 
     @Test
-    @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
-            ADD_USER,
-            ADD_USER_2,
-            ADD_ITEM
-    })
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2, ADD_ITEM})
     void givenNoBooker_whenCreatingBooking_thenThrowException() {
         assertThatThrownBy(() -> bookingService.createBooking(bookingCreateDto, 99L))
                 .isInstanceOf(NotFoundException.class);
     }
 
     @Test
-    @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
-            ADD_USER,
-            ADD_USER_2,
-            ADD_ITEM_NOT_AVAILABLE
-    })
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2, ADD_ITEM_NOT_AVAILABLE})
     void givenItemNotAvailable_whenCreatingBooking_thenThrowException() {
         assertThatThrownBy(() -> bookingService.createBooking(bookingCreateDto, 2L))
                 .isInstanceOf(NotAvailableException.class);
     }
 
     @Test
-    @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
-            ADD_USER,
-            ADD_USER_2,
-            ADD_ITEM
-    })
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2, ADD_ITEM})
     void givenItem_whenCreatingBookingForOwnItem_thenThrowException() {
         assertThatThrownBy(() -> bookingService.createBooking(bookingCreateDto, 1L))
                 .isInstanceOf(NotFoundException.class);
     }
 
     @Test
-    @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
-            ADD_USER,
-            ADD_USER_2,
-            ADD_ITEM,
-    })
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2, ADD_ITEM})
     void givenSavedBooking_whenConfirmingBooking_thenBookingIsConfirmed() {
         bookingService.createBooking(bookingCreateDto, 2L);
         var result = bookingService.confirmBooking(1L, 1L, Boolean.TRUE);
@@ -187,14 +125,7 @@ class BookingServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
-            ADD_USER,
-            ADD_USER_2,
-            ADD_ITEM,
-    })
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2, ADD_ITEM})
     void givenBooking_whenApprovingAlreadyApprovedBooking_thenThrowException() {
         bookingService.createBooking(bookingCreateDto, 2L);
         bookingService.confirmBooking(1L, 1L, Boolean.TRUE);
@@ -203,14 +134,7 @@ class BookingServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
-            ADD_USER,
-            ADD_USER_2,
-            ADD_ITEM,
-    })
+    @Sql(statements = {RESET_IDS, ADD_USER, ADD_USER_2, ADD_ITEM})
     void givenBooking_whenApprovingNotOwnBooking_thenThrowException() {
         bookingService.createBooking(bookingCreateDto, 2L);
         assertThatThrownBy(() -> bookingService.confirmBooking(1L, 2L, Boolean.TRUE))
@@ -219,9 +143,7 @@ class BookingServiceTest implements Queries {
 
     @Test
     @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
+            RESET_IDS,
             ADD_USER,
             ADD_USER_2,
             ADD_ITEM,
@@ -239,9 +161,7 @@ class BookingServiceTest implements Queries {
 
     @Test
     @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
+            RESET_IDS,
             ADD_USER,
             ADD_USER_2,
             ADD_ITEM,
@@ -259,9 +179,7 @@ class BookingServiceTest implements Queries {
 
     @Test
     @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
+            RESET_IDS,
             ADD_USER,
             ADD_USER_2,
             ADD_ITEM,
@@ -279,9 +197,7 @@ class BookingServiceTest implements Queries {
 
     @Test
     @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
+            RESET_IDS,
             ADD_USER,
             ADD_USER_2,
             ADD_ITEM,
@@ -299,9 +215,7 @@ class BookingServiceTest implements Queries {
 
     @Test
     @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
+            RESET_IDS,
             ADD_USER,
             ADD_USER_2,
             ADD_ITEM,
@@ -319,9 +233,7 @@ class BookingServiceTest implements Queries {
 
     @Test
     @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
+            RESET_IDS,
             ADD_USER,
             ADD_USER_2,
             ADD_ITEM,
@@ -339,9 +251,7 @@ class BookingServiceTest implements Queries {
 
     @Test
     @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
+            RESET_IDS,
             ADD_USER,
             ADD_USER_2,
             ADD_ITEM,
@@ -358,9 +268,7 @@ class BookingServiceTest implements Queries {
 
     @Test
     @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
+            RESET_IDS,
             ADD_USER,
             ADD_USER_2,
             ADD_ITEM,
@@ -378,9 +286,7 @@ class BookingServiceTest implements Queries {
 
     @Test
     @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
+            RESET_IDS,
             ADD_USER,
             ADD_USER_2,
             ADD_ITEM,
@@ -398,9 +304,7 @@ class BookingServiceTest implements Queries {
 
     @Test
     @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
+            RESET_IDS,
             ADD_USER,
             ADD_USER_2,
             ADD_ITEM,
@@ -418,9 +322,7 @@ class BookingServiceTest implements Queries {
 
     @Test
     @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
+            RESET_IDS,
             ADD_USER,
             ADD_USER_2,
             ADD_ITEM,
@@ -438,9 +340,7 @@ class BookingServiceTest implements Queries {
 
     @Test
     @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
+            RESET_IDS,
             ADD_USER,
             ADD_USER_2,
             ADD_ITEM,
@@ -458,9 +358,7 @@ class BookingServiceTest implements Queries {
 
     @Test
     @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
+            RESET_IDS,
             ADD_USER,
             ADD_USER_2,
             ADD_ITEM,
@@ -478,9 +376,7 @@ class BookingServiceTest implements Queries {
 
     @Test
     @Sql(statements = {
-            RESET_USERS_ID,
-            RESET_ITEMS_ID,
-            RESET_BOOKINGS_ID,
+            RESET_IDS,
             ADD_USER,
             ADD_USER_2,
             ADD_ITEM,

@@ -59,7 +59,7 @@ class UserServiceTest implements Queries {
     }
 
     @Test
-    @Sql(statements = RESET_USERS_ID)
+    @Sql(statements = RESET_IDS)
     void givenValidUserDto_whenCreatingUser_thenGetResponseDto() {
         ResponseUserDto result = userService.createUser(userCreateDtoOne);
         assertThat(result.getId()).isEqualTo(1L);
