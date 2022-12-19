@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
@@ -14,6 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class ItemWithBookingsDto implements Serializable {
     private final Long id;
     private final String name;

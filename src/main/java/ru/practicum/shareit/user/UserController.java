@@ -4,9 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -23,13 +23,17 @@ import ru.practicum.shareit.user.dto.UserListDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+
+import static ru.practicum.shareit.util.Convert.toPageRequest;
 
 @RestController
 @RequestMapping(path = "/users")
 @Slf4j
 @RequiredArgsConstructor
 @Tag(name = "User services")
+@Validated
 public class UserController {
 
     private final UserService userService;
@@ -37,16 +41,16 @@ public class UserController {
     @GetMapping
     @Operation(summary = "Get a list of all users")
     public ResponseEntity<UserListDto> findAllUsers(
-            @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size
+            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = "10") @Positive Integer size
     ) {
         log.info("Getting a list of all users");
-        return ResponseEntity.ok(userService.findAllUsers(PageRequest.of(from, size)));
+        return ResponseEntity.ok(userService.findAllUsers(toPageRequest(from, size)));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a specific user")
-    public ResponseEntity<ResponseUserDto> findUser(@PathVariable @Min(1) Long id) {
+    public ResponseEntity<ResponseUserDto> findUser(@PathVariable @Positive Long id) {
         log.info("Getting a user with ID: {}", id);
         return ResponseEntity.ok(userService.findUser(id));
     }
@@ -61,7 +65,7 @@ public class UserController {
     @PatchMapping("/{id}")
     @Operation(summary = "Update user")
     public ResponseEntity<ResponseUserDto> updateUser(
-            @PathVariable @Min(1) Long id,
+            @PathVariable @Positive Long id,
             @RequestBody @Valid UpdateUserDto updateUserDto
     ) {
         log.info("Updating user with ID: " + id);
@@ -70,8 +74,9 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete user")
-    public void deleteUser(@PathVariable @Min(1) Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable @Positive Long id) {
         log.info("Deleting user with ID: " + id);
         userService.deleteUser(id);
+        return ResponseEntity.ok().build();
     }
 }

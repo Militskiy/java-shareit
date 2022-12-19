@@ -7,8 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.CreationTimestamp;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,16 +19,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "item_requests")
@@ -39,8 +42,10 @@ public class ItemRequest {
     @ManyToOne
     @JoinColumn(name = "requester_id")
     private User requester;
-    @Temporal(value = TemporalType.TIMESTAMP)
-    private Date created;
+    @CreationTimestamp
+    private LocalDateTime created;
+    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL)
+    private Set<Item> items;
 
     @Override
     public boolean equals(Object o) {

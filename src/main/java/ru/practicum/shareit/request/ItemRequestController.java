@@ -1,12 +1,87 @@
 package ru.practicum.shareit.request;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.request.dto.ItemRequestCreateDto;
+import ru.practicum.shareit.request.dto.ItemRequestCreateResponseDto;
+import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
+import ru.practicum.shareit.request.dto.ItemRequestResponseDtoList;
+import ru.practicum.shareit.request.service.ItemRequestService;
 
-/**
- * TODO Sprint add-item-requests.
- */
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+
+import static ru.practicum.shareit.util.Convert.toPageRequest;
+
 @RestController
 @RequestMapping(path = "/requests")
+@Slf4j
+@RequiredArgsConstructor
+@Tag(name = "Item request service")
+@Validated
 public class ItemRequestController {
+    private static final String HEADER_USER_ID = "X-Sharer-User-Id";
+    private final ItemRequestService itemRequestService;
+
+    @PostMapping
+    @Operation(summary = "Create an item request")
+    public ResponseEntity<ItemRequestCreateResponseDto> createItemRequest(
+            @RequestHeader(HEADER_USER_ID) @Positive Long userId,
+            @RequestBody @Valid ItemRequestCreateDto itemRequestCreateDto
+    ) {
+        log.info("Creating item request with description: {}", itemRequestCreateDto.getDescription());
+        return ResponseEntity.ok(itemRequestService.create(itemRequestCreateDto, userId));
+    }
+
+    @GetMapping
+    @Operation(summary = "Get owm item requests")
+    public ResponseEntity<ItemRequestResponseDtoList> findOwnRequests(
+            @RequestHeader(HEADER_USER_ID) @Positive Long userId,
+            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = "10") @Positive Integer size
+    ) {
+        log.info("Getting a list of item requests made by user with ID: {}", userId);
+        return ResponseEntity.ok(itemRequestService.findOwnRequests(
+                userId,
+                toPageRequest(from, size).withSort(Sort.by("created").descending())
+        ));
+    }
+
+    @GetMapping("/all")
+    @Operation(summary = "Get all item requests")
+    public ResponseEntity<ItemRequestResponseDtoList> findAllRequests(
+            @RequestHeader(HEADER_USER_ID) @Positive Long userId,
+            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = "10") @Positive Integer size
+    ) {
+        log.info("Getting a list of all item requests");
+        return ResponseEntity.ok(itemRequestService.findAllRequests(
+                userId,
+                toPageRequest(from, size).withSort(Sort.by("created").descending())
+        ));
+    }
+
+    @GetMapping("/{requestId}")
+    @Operation(summary = "Get request by ID")
+    public ResponseEntity<ItemRequestResponseDto> findById(
+            @RequestHeader(HEADER_USER_ID) @Positive Long userId,
+            @PathVariable @Positive Long requestId
+    ) {
+        log.info("Getting item request with ID: {}", requestId);
+        return ResponseEntity.ok(itemRequestService.findById(requestId, userId));
+    }
 }

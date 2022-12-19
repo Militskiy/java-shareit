@@ -10,16 +10,20 @@ import org.hibernate.Hibernate;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -33,17 +37,17 @@ public class Item {
     @Column(name = "item_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
-    @Column(name = "item_name")
+    @Column(name = "item_name", nullable = false)
     private String name;
     @NotNull
     private String description;
     @NotNull
     private Boolean available;
     @ManyToOne
-    @JoinColumn(name = "owner_id")
-    @NotNull
+    @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.ALL)
+    private Set<Comment> comments;
     @ManyToOne
     @JoinColumn(name = "request_id")
     private ItemRequest request;

@@ -18,6 +18,7 @@ import ru.practicum.shareit.item.exceptions.CommentException;
 import ru.practicum.shareit.item.exceptions.WrongUserException;
 import ru.practicum.shareit.user.exceptions.DuplicateEmailException;
 
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,16 +74,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
             final MethodArgumentTypeMismatchException e
     ) {
-        String error = "Unknown " + e.getName() + ": " + e.getValue();
+        final String error = "Unknown " + e.getName() + ": " + e.getValue();
         log.warn(error);
         return ResponseEntity.status(400).body(new ErrorResponse(error));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            final IllegalArgumentException e
+    ) {
+        log.warn(e.getMessage());
+        return ResponseEntity.status(400).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(
             final MissingServletRequestParameterException e
     ) {
-        String error = "Missing request parameter: " + e.getParameterName();
+        final String error = "Missing request parameter: " + e.getParameterName();
         log.warn(error);
         return ResponseEntity.status(400).body(new ErrorResponse(error));
     }
@@ -93,10 +102,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(400).body(new ErrorResponse(e.getMessage()));
     }
 
-    @ExceptionHandler(value = {DataIntegrityViolationException.class})
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(DataIntegrityViolationException e) {
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         log.warn(e.getMessage());
         return ResponseEntity.status(409).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
+        log.warn(e.getMessage());
+        return ResponseEntity.status(400).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler
@@ -104,7 +119,7 @@ public class GlobalExceptionHandler {
         List<String> errorList = e.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.toList());
-        String errors = errorList.toString().substring(1, errorList.toString().length() - 1);
+        final String errors = errorList.toString().substring(1, errorList.toString().length() - 1);
         log.warn(errors);
         return ResponseEntity.status(400).body(new ErrorResponse(errors));
     }

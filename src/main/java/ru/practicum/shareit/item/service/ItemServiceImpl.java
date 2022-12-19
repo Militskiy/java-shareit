@@ -30,8 +30,6 @@ import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,19 +48,18 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public ItemWithBookingsDto findItem(Long id, Long userId) {
-        Item item = getItem(id);
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("No item with ID: " + id));
         ItemWithBookingsDto itemDto = itemMapper.itemToItemWithBookingsDto(item);
-        List<CommentResponseDto> comments = commentMapper.map(commentRepository.findCommentsByItem_Id(id));
-        itemDto.setComments(Set.copyOf(comments));
         if (item.getOwner().getId().equals(userId)) {
             BookingShortDto lastBooking = bookingMapper.bookingToBookingShortDto(
-                    bookingRepository.findFirstByItem_IdAndEndIsBeforeOrderByEndDesc(
-                            id, LocalDateTime.now()
+                    bookingRepository.findFirstByItem_IdAndStatusAndStartIsBeforeOrderByStartDesc(
+                            id, Status.APPROVED, LocalDateTime.now()
                     )
             );
             BookingShortDto nextBooking = bookingMapper.bookingToBookingShortDto(
-                    bookingRepository.findFirstByItem_IdAndStartIsAfterOrderByStartAsc(
-                            id, LocalDateTime.now()
+                    bookingRepository.findFirstByItem_IdAndStatusAndStartIsAfterOrderByStartAsc(
+                            id, Status.APPROVED, LocalDateTime.now()
                     )
             );
             itemDto.setLastBooking(lastBooking);
@@ -84,22 +81,18 @@ public class ItemServiceImpl implements ItemService {
                                     .peek(item -> {
                                         item.setLastBooking(
                                                 bookingMapper.bookingToBookingShortDto(bookingRepository
-                                                        .findFirstByItem_IdAndEndIsBeforeOrderByEndDesc(
-                                                                item.getId(), LocalDateTime.now()
+                                                        .findFirstByItem_IdAndStatusAndStartIsBeforeOrderByStartDesc(
+                                                                item.getId(), Status.APPROVED, LocalDateTime.now()
                                                         )
                                                 )
                                         );
                                         item.setNextBooking(
                                                 bookingMapper.bookingToBookingShortDto(bookingRepository
-                                                        .findFirstByItem_IdAndStartIsAfterOrderByStartAsc(
-                                                                item.getId(), LocalDateTime.now()
+                                                        .findFirstByItem_IdAndStatusAndStartIsAfterOrderByStartAsc(
+                                                                item.getId(), Status.APPROVED, LocalDateTime.now()
                                                         )
                                                 )
                                         );
-                                        item.setComments(Set.copyOf(commentMapper.map(
-                                                        commentRepository.findCommentsByItem_Id(item.getId())
-                                                )
-                                        ));
                                     })
                                     .collect(Collectors.toList())
                     )
@@ -112,6 +105,9 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ResponseItemDto createItem(ItemDto itemDto, Long ownerId) {
         Item newItem = itemMapper.itemDtoToItem(itemDto);
+        if (newItem.getRequest().getId() == null) {
+            newItem.setRequest(null);
+        }
         newItem.setOwner(userRepository
                 .findById(ownerId)
                 .orElseThrow(() -> new NotFoundException("No user with ID: " + ownerId)));
