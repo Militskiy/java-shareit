@@ -68,7 +68,7 @@ public class BookingController {
     public ResponseEntity<BookingListDto> findBookingsByOwner(
             @RequestHeader(HEADER_USER_ID) @Positive Long ownerId,
             @RequestParam(defaultValue = "ALL") State state,
-            @RequestParam(defaultValue = "1") @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
             @RequestParam(defaultValue = "10") @Positive Integer size
     ) {
         log.info("Getting {} bookings of user with ID: {}", state, ownerId);
