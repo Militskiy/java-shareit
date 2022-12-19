@@ -31,6 +31,7 @@ import ru.practicum.shareit.item.service.ItemService;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 import static ru.practicum.shareit.util.Convert.toPageRequest;
 
@@ -49,8 +50,8 @@ public class ItemController {
     @Operation(summary = "Get a list of all items that belong to specific user")
     public ResponseEntity<ItemListWithBookingsDto> findAllItems(
             @RequestHeader(HEADER_USER_ID) @Positive Long userId,
-            @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size
+            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = "10") @Positive Integer size
     ) {
         log.info("Getting a list of all items that belong to user with ID: " + userId);
         return ResponseEntity.ok(itemService.findAllItems(
@@ -72,8 +73,8 @@ public class ItemController {
     @Operation(summary = "Search for items")
     public ResponseEntity<ItemListDto> searchForItems(
             @RequestParam String text,
-            @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size
+            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = "10") @Positive Integer size
     ) {
         log.info("Searching for items, keyword: " + text);
         return ResponseEntity.ok(itemService.searchItems(

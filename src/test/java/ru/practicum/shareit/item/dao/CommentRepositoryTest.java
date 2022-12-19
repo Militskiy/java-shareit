@@ -41,7 +41,7 @@ class CommentRepositoryTest implements Queries {
 
     @Test
     @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER, ADD_ITEM, ADD_USER_2, ADD_BOOKING_ITEM1_USER2, TEST})
-    void givenSavedComment_whenFindingComment_getComment() {
+    void commentEntityTest() {
         var result = commentRepository.getReferenceById(1L);
         Set<Comment> testSet = Set.of(result);
         Assertions.assertThat(testSet).contains(comment);

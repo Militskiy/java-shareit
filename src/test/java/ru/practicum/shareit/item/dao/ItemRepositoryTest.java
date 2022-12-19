@@ -31,7 +31,7 @@ class ItemRepositoryTest implements Queries {
 
     @Test
     @Sql(statements = {RESET_USERS_ID, RESET_ITEMS_ID, ADD_USER, ADD_ITEM})
-    void findAllByDescriptionContainingIgnoreCaseAndAvailableIsTrue() {
+    void itemEntityTest() {
         var result = itemRepository.getReferenceById(1L);
         Set<Item> testSet = Set.of(result);
         Assertions.assertThat(testSet).contains(item);

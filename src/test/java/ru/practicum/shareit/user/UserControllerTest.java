@@ -7,14 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.exceptions.GlobalExceptionHandler;
+import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.user.dto.ResponseUserDto;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserListDto;
+import ru.practicum.shareit.user.exceptions.DuplicateEmailException;
 import ru.practicum.shareit.user.service.UserService;
 
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -74,6 +77,16 @@ class UserControllerTest {
     }
 
     @Test
+    void givenNoUsers_whenFindingUser_thenStatusIs404() throws Exception {
+        when(userService.findUser(anyLong())).thenThrow(NotFoundException.class);
+
+        this.mockMvc.perform(
+                        get("/users/1")
+                )
+                .andExpect(status().is(404));
+    }
+
+    @Test
     void givenValidUserDto_whenCreatingUser_thenStatusIsOk() throws Exception {
         final String createDtoBody = objectMapper.writeValueAsString(userDto);
         final String responseBody = objectMapper.writeValueAsString(responseUserDto);
@@ -85,6 +98,30 @@ class UserControllerTest {
                 )
                 .andExpect(status().isCreated())
                 .andExpect(content().json(responseBody));
+    }
+
+    @Test
+    void givenDuplicateEmail_whenCreatingUser_thenDuplicateEmailException() throws Exception {
+        final String createDtoBody = objectMapper.writeValueAsString(userDto);
+        when(userService.createUser(userDto)).thenThrow(DuplicateEmailException.class);
+        this.mockMvc.perform(
+                        post("/users")
+                                .contentType("application/json")
+                                .content(createDtoBody)
+                )
+                .andExpect(status().is(409));
+    }
+
+    @Test
+    void givenDuplicateEmail_whenCreatingUser_thenBadRequest() throws Exception {
+        final String createDtoBody = objectMapper.writeValueAsString(userDto);
+        when(userService.createUser(userDto)).thenThrow(DataIntegrityViolationException.class);
+        this.mockMvc.perform(
+                        post("/users")
+                                .contentType("application/json")
+                                .content(createDtoBody)
+                )
+                .andExpect(status().is(409));
     }
 
     @Test

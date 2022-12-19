@@ -21,6 +21,7 @@ import ru.practicum.shareit.item.dto.ItemListWithBookingsDto;
 import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import ru.practicum.shareit.item.dto.ResponseItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
+import ru.practicum.shareit.item.exceptions.CommentException;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.time.LocalDateTime;
@@ -156,6 +157,17 @@ class ItemControllerTest {
     }
 
     @Test
+    void givenInvalidSearchItemRequest_whenSearchingItem_thenBadRequest() throws Exception {
+        this.mockMvc.perform(
+                        get("/items/search")
+                                .queryParam("text", "item")
+                                .queryParam("from", "-1")
+                                .queryParam("size", "10")
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void givenValidItemCreateDto_whenCreatingItem_thenStatusIsCreated() throws Exception {
         when(itemService.createItem(itemCreateDtoOne, 1L)).thenReturn(responseItemDtoOne);
 
@@ -217,5 +229,20 @@ class ItemControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(responseBody));
+    }
+
+    @Test
+    void givenCommentCreateDto_whenCommentingItemWithoutBooking_thenGetBadRequest() throws Exception {
+        when(itemService.commentItem(1L, 1L, commentCreateDto)).thenThrow(CommentException.class);
+
+        final String requestBody = objectMapper.writeValueAsString(commentCreateDto);
+
+        this.mockMvc.perform(
+                        post("/items/1/comment")
+                                .header("X-Sharer-User-Id", 1L)
+                                .content(requestBody)
+                                .contentType("application/json")
+                )
+                .andExpect(status().isBadRequest());
     }
 }

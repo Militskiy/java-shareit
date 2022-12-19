@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -100,6 +101,20 @@ class BookingServiceTest implements Queries {
     @Test
     @Sql(statements = {
             RESET_USERS_ID,
+            RESET_ITEMS_ID,
+            RESET_BOOKINGS_ID,
+            ADD_USER,
+            ADD_USER_2,
+            ADD_ITEM
+    })
+    void givenEmptyCreateDto_whenCreatingItem_getEqualResultBack() {
+        assertThatThrownBy(() -> bookingService.createBooking(BookingCreateDto.builder().build(), 2L))
+                .isInstanceOf(InvalidDataAccessApiUsageException.class);
+    }
+
+    @Test
+    @Sql(statements = {
+            RESET_USERS_ID,
             RESET_BOOKINGS_ID,
             ADD_USER,
             ADD_USER_2
@@ -160,7 +175,7 @@ class BookingServiceTest implements Queries {
             ADD_USER_2,
             ADD_ITEM,
     })
-    void confirmBooking() {
+    void givenSavedBooking_whenConfirmingBooking_thenBookingIsConfirmed() {
         bookingService.createBooking(bookingCreateDto, 2L);
         var result = bookingService.confirmBooking(1L, 1L, Boolean.TRUE);
         assertThat(result.getId()).isEqualTo(1L);

@@ -28,7 +28,7 @@ class UserRepositoryTest implements Queries {
 
     @Test
     @Sql(statements = {RESET_USERS_ID, ADD_USER})
-    void whenFindingUserById_thenGetUser() {
+    void userEntityTest() {
         User result = userRepository.getReferenceById(1L);
         Set<User> testSet = Set.of(result);
         Assertions.assertThat(testSet).contains(user);

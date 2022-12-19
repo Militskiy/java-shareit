@@ -14,11 +14,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingListDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.booking.exceptions.BookingApprovalException;
+import ru.practicum.shareit.booking.exceptions.NotAvailableException;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exceptions.GlobalExceptionHandler;
 import ru.practicum.shareit.item.dto.ItemShortResponseDto;
+import ru.practicum.shareit.item.exceptions.WrongUserException;
 import ru.practicum.shareit.user.dto.UserIdDto;
 
 import java.time.LocalDateTime;
@@ -83,10 +86,21 @@ class BookingControllerTest {
                 .thenReturn(BookingListDto.builder().build());
 
         mockMvc.perform(
-                        get("/bookings").header("X-Sharer-User-Id", 1)
+                        get("/bookings")
+                                .header("X-Sharer-User-Id", 1)
                                 .queryParam("state", "ALL")
                 )
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void givenMissingHeaderRequest_thenThrowException() throws Exception {
+
+        mockMvc.perform(
+                        get("/bookings")
+                                .queryParam("state", "ALL")
+                )
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -122,6 +136,20 @@ class BookingControllerTest {
                                 .content(createBody)
                 )
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void givenItemNotAvailable_whenCreatingBooking_thenThrowException() throws Exception {
+        when(bookingService.createBooking(bookingCreateDto, 1L)).thenThrow(NotAvailableException.class);
+        final String createBody = objectMapper.writeValueAsString(bookingCreateDto);
+
+        mockMvc.perform(
+                        post("/bookings")
+                                .header("X-Sharer-User-Id", 1)
+                                .contentType("application/json")
+                                .content(createBody)
+                )
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -170,5 +198,40 @@ class BookingControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(bookingResponseDto)));
+    }
+
+    @Test
+    void givenConfirmBookingRequest_whenConfirmingNotOwnBooking_thenThrowException() throws Exception {
+        ReflectionTestUtils.setField(bookingResponseDto, "status", Status.APPROVED);
+        when(bookingService.confirmBooking(1L, 1L, Boolean.TRUE)).thenThrow(WrongUserException.class);
+
+        mockMvc.perform(
+                        patch("/bookings/1")
+                                .header("X-Sharer-User-Id", 1)
+                                .queryParam("approved", "true")
+                )
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void givenConfirmBookingRequest_whenConfirmingAlreadyConfirmed_thenThrowException() throws Exception {
+        ReflectionTestUtils.setField(bookingResponseDto, "status", Status.APPROVED);
+        when(bookingService.confirmBooking(1L, 1L, Boolean.TRUE)).thenThrow(BookingApprovalException.class);
+
+        mockMvc.perform(
+                        patch("/bookings/1")
+                                .header("X-Sharer-User-Id", 1)
+                                .queryParam("approved", "true")
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void givenConfirmBookingRequest_whenMissingApprovedParameter_thenThrowException() throws Exception {
+        mockMvc.perform(
+                        patch("/bookings/1")
+                                .header("X-Sharer-User-Id", 1)
+                )
+                .andExpect(status().isBadRequest());
     }
 }
