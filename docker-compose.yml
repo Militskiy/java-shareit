@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  #  gateway:
+  #    build:
+  #    image:
+  #    container_name:
+  #    ports:
+  #      - "8080:8080"
+  #    depends_on:
+  #    environment:
+  #      - SHAREIT_SERVER_URL=http://server:9090
+
+  db:
+    image: postgres:13.7-alpine
+    container_name: db
+    ports:
+      - "6541:5432"
+    environment:
+      - POSTGRES_DB=shareit
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+
+  server:
+    build: ./server
+    image: amazoncorretto:11
+    container_name: server
+    ports:
+      - "9090:9090"
+    depends_on:
+      - db
+    environment:
+      - DB_NAME=shareit
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - DB_HOST=db
+      - DB_PORT=5432
