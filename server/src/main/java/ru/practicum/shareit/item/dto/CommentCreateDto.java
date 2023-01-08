@@ -5,7 +5,6 @@ import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**
@@ -16,6 +15,5 @@ import java.io.Serializable;
 @Jacksonized
 @Valid
 public class CommentCreateDto implements Serializable {
-    @NotBlank
     String text;
 }

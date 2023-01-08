@@ -157,17 +157,6 @@ class ItemControllerTest {
     }
 
     @Test
-    void givenInvalidSearchItemRequest_whenSearchingItem_thenBadRequest() throws Exception {
-        this.mockMvc.perform(
-                        get("/items/search")
-                                .queryParam("text", "item")
-                                .queryParam("from", "-1")
-                                .queryParam("size", "10")
-                )
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void givenValidItemCreateDto_whenCreatingItem_thenStatusIsCreated() throws Exception {
         when(itemService.createItem(itemCreateDtoOne, 1L)).thenReturn(responseItemDtoOne);
 

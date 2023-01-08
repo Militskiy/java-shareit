@@ -19,28 +19,46 @@ import ru.practicum.shareit.item.dto.ItemUpdateRequest;
 @FeignClient(value = "items", path = "/items", url = "${shareit-server.url}")
 public interface ItemClient extends BaseClient<ItemCreateRequest> {
     @Cacheable(cacheNames = "items", key = "{#id, #userId}")
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/{id}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     ResponseEntity<Object> get(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable("id") Long id
     );
 
     @CacheEvict(cacheNames = "items", allEntries = true)
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     ResponseEntity<Void> delete(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable("id") Long id
     );
 
     @CacheEvict(cacheNames = "items", allEntries = true)
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(
+            method = RequestMethod.PATCH,
+            value = "/{id}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     ResponseEntity<Object> patch(
             @RequestBody ItemUpdateRequest updateRequest,
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable("id") Long id
     );
 
-    @RequestMapping(method = RequestMethod.GET, value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/search",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     ResponseEntity<Object> search(
             @RequestParam String text,
             @RequestParam Integer from,
@@ -48,7 +66,12 @@ public interface ItemClient extends BaseClient<ItemCreateRequest> {
     );
 
     @CacheEvict(cacheNames = "items", allEntries = true)
-    @RequestMapping(method = RequestMethod.POST, value = "/{id}/comment", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(
+            method = RequestMethod.POST,
+            value = "/{id}/comment",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     ResponseEntity<Object> comment(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable("id") Long id,

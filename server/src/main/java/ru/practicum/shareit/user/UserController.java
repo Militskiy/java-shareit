@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -22,10 +21,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserListDto;
 import ru.practicum.shareit.user.service.UserService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
-
 import static ru.practicum.shareit.util.Convert.toPageRequest;
 
 @RestController
@@ -33,7 +28,6 @@ import static ru.practicum.shareit.util.Convert.toPageRequest;
 @Slf4j
 @RequiredArgsConstructor
 @Tag(name = "User services")
-@Validated
 public class UserController {
 
     private final UserService userService;
@@ -41,8 +35,8 @@ public class UserController {
     @GetMapping
     @Operation(summary = "Get a list of all users")
     public ResponseEntity<UserListDto> findAllUsers(
-            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
-            @RequestParam(defaultValue = "10") @Positive Integer size
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size
     ) {
         log.info("Getting a list of all users");
         return ResponseEntity.ok(userService.findAllUsers(toPageRequest(from, size)));
@@ -50,14 +44,14 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a specific user")
-    public ResponseEntity<ResponseUserDto> findUser(@PathVariable @Positive Long id) {
+    public ResponseEntity<ResponseUserDto> findUser(@PathVariable Long id) {
         log.info("Getting a user with ID: {}", id);
         return ResponseEntity.ok(userService.findUser(id));
     }
 
     @PostMapping
     @Operation(summary = "Creates a new user")
-    public ResponseEntity<ResponseUserDto> createUser(@RequestBody @Valid UserDto userDto) {
+    public ResponseEntity<ResponseUserDto> createUser(@RequestBody UserDto userDto) {
         log.info("Creating a new user: {}", userDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userDto));
     }
@@ -65,8 +59,8 @@ public class UserController {
     @PatchMapping("/{id}")
     @Operation(summary = "Update user")
     public ResponseEntity<ResponseUserDto> updateUser(
-            @PathVariable @Positive Long id,
-            @RequestBody @Valid UpdateUserDto updateUserDto
+            @PathVariable Long id,
+            @RequestBody UpdateUserDto updateUserDto
     ) {
         log.info("Updating user with ID: " + id);
         return ResponseEntity.ok(userService.updateUser(updateUserDto, id));
@@ -74,7 +68,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete user")
-    public ResponseEntity<Void> deleteUser(@PathVariable @Positive Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         log.info("Deleting user with ID: " + id);
         userService.deleteUser(id);
         return ResponseEntity.ok().build();

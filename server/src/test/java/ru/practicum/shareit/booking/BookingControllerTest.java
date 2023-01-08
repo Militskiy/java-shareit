@@ -10,7 +10,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingListDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
@@ -26,7 +25,6 @@ import ru.practicum.shareit.user.dto.UserIdDto;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -150,44 +148,6 @@ class BookingControllerTest {
                                 .content(createBody)
                 )
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void givenNewBookingStartInThePast_whenCreatingBooking_thenThrowValidationException() throws Exception {
-        var bookingBadStartDto = BookingCreateDto.builder()
-                .itemId(1L)
-                .start(LocalDateTime.now().minusHours(1))
-                .end(LocalDateTime.now().plusDays(1))
-                .build();
-        final String createBody = objectMapper.writeValueAsString(bookingBadStartDto);
-
-        mockMvc.perform(
-                        post("/bookings")
-                                .header("X-Sharer-User-Id", 1)
-                                .contentType("application/json")
-                                .content(createBody)
-                )
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(
-                        result.getResolvedException() instanceof MethodArgumentNotValidException
-                ));
-    }
-
-    @Test
-    void givenNewBookingNullStart_whenCreatingBooking_thenThrowValidationException() throws Exception {
-        ReflectionTestUtils.setField(bookingCreateDto, "start", null);
-        final String createBody = objectMapper.writeValueAsString(bookingCreateDto);
-
-        mockMvc.perform(
-                        post("/bookings")
-                                .header("X-Sharer-User-Id", 1)
-                                .contentType("application/json")
-                                .content(createBody)
-                )
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(
-                        result.getResolvedException() instanceof MethodArgumentNotValidException
-                ));
     }
 
     @Test
