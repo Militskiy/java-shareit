@@ -15,7 +15,6 @@ import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.ResponseUserDto;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserListDto;
 import ru.practicum.shareit.user.exceptions.DuplicateEmailException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,10 +51,10 @@ class UserServiceTest implements Queries {
     }
 
     @Test
-    void findAllUsers() {
-        ResponseUserDto savedUserOne = userService.createUser(userCreateDtoOne);
-        ResponseUserDto savedUserTwo = userService.createUser(userCreateDtoTwo);
-        UserListDto result = userService.findAllUsers(PageRequest.of(0, 10));
+    void givenTwoSavedUsers_whenFindingAll_thenTwoUsersFound() {
+        var savedUserOne = userService.createUser(userCreateDtoOne);
+        var savedUserTwo = userService.createUser(userCreateDtoTwo);
+        var result = userService.findAllUsers(PageRequest.of(0, 10));
         assertThat(result.getUserDtoList()).hasSize(2);
         assertThat(savedUserOne).usingRecursiveComparison().isEqualTo(result.getUserDtoList().get(0));
         assertThat(savedUserTwo).usingRecursiveComparison().isEqualTo(result.getUserDtoList().get(1));
