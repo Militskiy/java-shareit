@@ -75,7 +75,7 @@ public interface BookingClient extends BaseClient<BookingCreateRequest> {
     );
 
     @Override
-    @CacheEvict(cacheNames = "items", key = "#createRequest.itemId")
+    @CacheEvict(cacheNames = "items", allEntries = true)
     @RequestMapping(
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_VALUE,

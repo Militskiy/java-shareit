@@ -55,12 +55,12 @@ public class ItemServiceImpl implements ItemService {
             BookingShortDto lastBooking = bookingMapper.bookingToBookingShortDto(
                     bookingRepository.findFirstByItem_IdAndStatusAndStartIsBeforeOrderByStartDesc(
                             id, Status.APPROVED, LocalDateTime.now()
-                    )
+                    ).orElse(null)
             );
             BookingShortDto nextBooking = bookingMapper.bookingToBookingShortDto(
                     bookingRepository.findFirstByItem_IdAndStatusAndStartIsAfterOrderByStartAsc(
                             id, Status.APPROVED, LocalDateTime.now()
-                    )
+                    ).orElse(null)
             );
             itemDto.setLastBooking(lastBooking);
             itemDto.setNextBooking(nextBooking);
@@ -83,14 +83,14 @@ public class ItemServiceImpl implements ItemService {
                                                 bookingMapper.bookingToBookingShortDto(bookingRepository
                                                         .findFirstByItem_IdAndStatusAndStartIsBeforeOrderByStartDesc(
                                                                 item.getId(), Status.APPROVED, LocalDateTime.now()
-                                                        )
+                                                        ).orElse(null)
                                                 )
                                         );
                                         item.setNextBooking(
                                                 bookingMapper.bookingToBookingShortDto(bookingRepository
                                                         .findFirstByItem_IdAndStatusAndStartIsAfterOrderByStartAsc(
                                                                 item.getId(), Status.APPROVED, LocalDateTime.now()
-                                                        )
+                                                        ).orElse(null)
                                                 )
                                         );
                                     })
