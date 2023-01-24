@@ -41,7 +41,7 @@ public class BookingController {
             @RequestHeader(HEADER_USER_ID) @Positive Long userId
     ) {
         log.info("Requesting booking with ID: {}", id);
-        return client.get(id, userId);
+        return ResponseEntity.ok(client.get(id, userId));
     }
 
     @GetMapping
@@ -86,6 +86,6 @@ public class BookingController {
             @RequestParam Boolean approved
     ) {
         log.info("User with ID: {} is confirming booking with ID: {}, approved: {}", userId, id, approved);
-        return client.patch(id, userId, approved);
+        return ResponseEntity.ok(client.patch(id, userId, approved));
     }
 }

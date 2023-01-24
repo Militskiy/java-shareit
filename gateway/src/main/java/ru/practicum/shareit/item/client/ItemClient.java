@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.shareit.BaseClient;
 import ru.practicum.shareit.item.dto.CommentCreateRequest;
 import ru.practicum.shareit.item.dto.ItemCreateRequest;
+import ru.practicum.shareit.item.dto.ItemResponse;
 import ru.practicum.shareit.item.dto.ItemUpdateRequest;
 
 @FeignClient(value = "items", path = "/items", url = "${shareit-server.url}")
@@ -25,7 +26,7 @@ public interface ItemClient extends BaseClient<ItemCreateRequest> {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    ResponseEntity<Object> get(
+    ItemResponse get(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable("id") Long id
     );
@@ -35,7 +36,7 @@ public interface ItemClient extends BaseClient<ItemCreateRequest> {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    ResponseEntity<Void> delete(
+    void delete(
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable("id") Long id
     );
@@ -47,7 +48,7 @@ public interface ItemClient extends BaseClient<ItemCreateRequest> {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    ResponseEntity<Object> patch(
+    ItemResponse patch(
             @RequestBody ItemUpdateRequest updateRequest,
             @RequestHeader(HEADER_USER_ID) Long userId,
             @PathVariable("id") Long id

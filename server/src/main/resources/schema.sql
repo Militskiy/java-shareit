@@ -1,8 +1,4 @@
-drop table if exists users cascade;
-drop table if exists item_requests cascade;
-drop table if exists items cascade;
-drop table if exists bookings cascade;
-drop table if exists comments cascade;
+drop table if exists users, item_requests, items, bookings, comments cascade;
 
 create table if not exists users
 (

@@ -11,7 +11,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.Queries;
-import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.ResponseUserDto;
 import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -25,9 +24,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ActiveProfiles("test")
 @Transactional
 class UserServiceTest implements Queries {
-
-    @Autowired
-    private UserRepository userRepository;
     @Autowired
     private UserService userService;
     private UserDto userCreateDtoOne;
@@ -101,6 +97,6 @@ class UserServiceTest implements Queries {
     void deleteUser() {
         Long id = userService.createUser(userCreateDtoOne).getId();
         userService.deleteUser(id);
-        assertThat(userRepository.findAll()).hasSize(0);
+        assertThat(userService.findAllUsers(PageRequest.of(0, 10)).getUserDtoList()).hasSize(0);
     }
 }

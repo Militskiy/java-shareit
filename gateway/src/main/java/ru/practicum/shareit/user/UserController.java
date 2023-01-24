@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.user.client.UserClient;
 import ru.practicum.shareit.user.dto.UserCreateRequest;
+import ru.practicum.shareit.user.dto.UserResponse;
 import ru.practicum.shareit.user.dto.UserUpdateRequest;
 
 import javax.validation.Valid;
@@ -44,16 +46,16 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a specific user")
-    public ResponseEntity<Object> findUser(@PathVariable @Positive Long id) {
+    public ResponseEntity<UserResponse> findUser(@PathVariable @Positive Long id) {
         log.info("Getting a user with ID: {}", id);
-        return client.get(id);
+        return ResponseEntity.ok(client.get(id));
     }
 
     @PostMapping
     @Operation(summary = "Creates a new user")
     public ResponseEntity<Object> createUser(@RequestBody @Valid UserCreateRequest userCreateRequest) {
         log.info("Creating a new user: {}", userCreateRequest);
-        return client.post(userCreateRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(client.postUser(userCreateRequest));
     }
 
     @PatchMapping("/{id}")
@@ -63,13 +65,14 @@ public class UserController {
             @RequestBody @Valid UserUpdateRequest userUpdateRequest
     ) {
         log.info("Updating user with ID: " + id);
-        return client.patch(id, userUpdateRequest);
+        return ResponseEntity.ok(client.patch(id, userUpdateRequest));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete user")
     public ResponseEntity<Void> deleteUser(@PathVariable @Positive Long id) {
         log.info("Deleting user with ID: " + id);
-        return client.delete(id);
+        client.delete(id);
+        return ResponseEntity.ok().build();
     }
 }

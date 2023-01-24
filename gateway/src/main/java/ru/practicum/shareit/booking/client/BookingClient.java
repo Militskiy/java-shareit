@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.shareit.BaseClient;
 import ru.practicum.shareit.booking.dto.BookingCreateRequest;
+import ru.practicum.shareit.booking.dto.BookingResponse;
 import ru.practicum.shareit.booking.dto.State;
 
 import javax.validation.constraints.Positive;
@@ -27,7 +28,7 @@ public interface BookingClient extends BaseClient<BookingCreateRequest> {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    ResponseEntity<Object> get(
+    BookingResponse get(
             @PathVariable("id") Long id,
             @RequestHeader(HEADER_USER_ID) Long userId
     );
@@ -43,7 +44,7 @@ public interface BookingClient extends BaseClient<BookingCreateRequest> {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    ResponseEntity<Object> patch(
+    BookingResponse patch(
             @PathVariable Long id,
             @RequestHeader(HEADER_USER_ID) @Positive Long userId,
             @RequestParam Boolean approved

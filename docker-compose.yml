@@ -8,8 +8,11 @@ services:
       - "8080:8080"
     depends_on:
       - server
+      - cache
     environment:
       - SHAREIT_SERVER_URL=http://server:9090
+      - REDIS_PORT=6379
+      - REDIS_HOST=cache
   db:
     image: postgres:15.1-alpine
     container_name: db
@@ -28,8 +31,14 @@ services:
     depends_on:
       - db
     environment:
+      - "TZ=Asia/Dubai"
       - DB_NAME=shareit
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - DB_HOST=db
       - DB_PORT=5432
+  cache:
+    image: redis:7.0.8-alpine
+    container_name: cache
+    ports:
+      - "6379:6379"

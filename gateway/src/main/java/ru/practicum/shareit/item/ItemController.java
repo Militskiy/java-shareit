@@ -55,7 +55,7 @@ public class ItemController {
             @PathVariable @Min(1) Long id
     ) {
         log.info("Getting item with ID: " + id);
-        return client.get(userId, id);
+        return ResponseEntity.ok(client.get(userId, id));
     }
 
     @GetMapping("/search")
@@ -87,7 +87,7 @@ public class ItemController {
             @RequestBody @Valid ItemUpdateRequest itemUpdateRequest
     ) {
         log.info("Updating item with ID: " + id + " that belongs to user with ID: " + ownerId);
-        return client.patch(itemUpdateRequest, ownerId, id);
+        return ResponseEntity.ok(client.patch(itemUpdateRequest, ownerId, id));
     }
 
     @DeleteMapping("/{id}")
@@ -97,7 +97,8 @@ public class ItemController {
             @PathVariable @Positive Long id
     ) {
         log.info("Deleting item with ID: " + id + " that belongs to user with ID: " + userId);
-        return client.delete(userId, id);
+        client.delete(userId, id);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/comment")

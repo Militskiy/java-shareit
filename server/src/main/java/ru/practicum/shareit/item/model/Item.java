@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
@@ -43,12 +44,15 @@ public class Item {
     private String description;
     @NotNull
     private Boolean available;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.ALL)
     private Set<Comment> comments;
-    @ManyToOne
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "item", cascade = CascadeType.ALL)
+    private Set<Booking> bookings;
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id")
     private ItemRequest request;
 

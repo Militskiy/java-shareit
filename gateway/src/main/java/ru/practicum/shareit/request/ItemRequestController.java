@@ -71,6 +71,6 @@ public class ItemRequestController {
             @PathVariable @Positive Long requestId
     ) {
         log.info("Getting item request with ID: {}", requestId);
-        return client.get(userId, requestId);
+        return ResponseEntity.ok(client.get(userId, requestId));
     }
 }
